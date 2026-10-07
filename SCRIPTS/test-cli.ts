@@ -37,9 +37,15 @@ export async function runCliTests() {
 
   // Test 2: Port and Config Defaults
   console.log('\n[2] Port and Config Defaults');
+  const prevCurrentDb = process.env.CURRENT_DATABASE;
+  const prevPgPort = process.env.PGPORT;
   const prevDialect = process.env.DB_DIALECT;
   const prevPort = process.env.DB_PORT;
+  const prevDbUrl = process.env.DATABASE_URL;
+  delete process.env.CURRENT_DATABASE;
+  delete process.env.PGPORT;
   delete process.env.DB_PORT;
+  delete process.env.DATABASE_URL;
 
   process.env.DB_DIALECT = 'postgres';
   const pgConf = getDbConfig();
@@ -110,9 +116,16 @@ export async function runCliTests() {
   delete process.env.CURRENT_DATABASE;
 
   // Restore env
+  if (prevCurrentDb !== undefined) process.env.CURRENT_DATABASE = prevCurrentDb;
+  else delete process.env.CURRENT_DATABASE;
+  if (prevPgPort !== undefined) process.env.PGPORT = prevPgPort;
+  else delete process.env.PGPORT;
   if (prevDialect !== undefined) process.env.DB_DIALECT = prevDialect;
   else delete process.env.DB_DIALECT;
   if (prevPort !== undefined) process.env.DB_PORT = prevPort;
+  else delete process.env.DB_PORT;
+  if (prevDbUrl !== undefined) process.env.DATABASE_URL = prevDbUrl;
+  else delete process.env.DATABASE_URL;
 
   console.log('\n====================================================');
   console.log(`TOTAL TESTS: ${passed + failed} | PASSED: ${passed} | FAILED: ${failed}`);

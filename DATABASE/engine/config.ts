@@ -57,18 +57,25 @@ function parseConnectionString(connStr: string): Partial<DbConfig> | null {
 export function getDbConfig(): DbConfig {
   const rawExplicitDialect =
     process.env.CURRENT_DATABASE ||
+    process.env.DB_PROVIDER ||
+    process.env.DATABASE_PROVIDER ||
     process.env.DB_DIALECT ||
     process.env.DATABASE_DIALECT ||
+    process.env.DB_ENGINE ||
+    process.env.DATABASE_ENGINE ||
     process.env.SQL_DIALECT;
 
-  const explicitDialect = rawExplicitDialect ? normalizeDialect(rawExplicitDialect) : null;
+  let explicitDialect = rawExplicitDialect ? normalizeDialect(rawExplicitDialect) : null;
 
   const connectionUrl = process.env.DATABASE_URL || process.env.DB_URL;
   if (connectionUrl) {
     const parsed = parseConnectionString(connectionUrl);
     // If an explicit dialect was requested (e.g. mysql), only use connectionUrl if its dialect matches
     if (parsed && parsed.dialect && parsed.host && parsed.database) {
-      if (!explicitDialect || explicitDialect === parsed.dialect) {
+      if (!explicitDialect) {
+        explicitDialect = parsed.dialect;
+      }
+      if (explicitDialect === parsed.dialect) {
         return {
           dialect: parsed.dialect,
           host: parsed.host,
@@ -82,18 +89,29 @@ export function getDbConfig(): DbConfig {
     }
   }
 
+  // If no explicit dialect and no matching connection URL, check provider/port clues
+  if (!explicitDialect) {
+    const isPort3306 = process.env.DB_PORT === '3306' || process.env.MYSQLPORT === '3306';
+    const hasMysqlVars = Boolean(process.env.MYSQLHOST || process.env.MYSQLUSER || process.env.MYSQLDATABASE);
+    const hasPgVars = Boolean(process.env.PGHOST || process.env.PGUSER || process.env.PGDATABASE);
+
+    if ((isPort3306 || hasMysqlVars) && !hasPgVars) {
+      explicitDialect = 'mysql';
+    }
+  }
+
   const dialect = explicitDialect || 'postgres';
 
   if (dialect === 'mysql') {
-    const host = (process.env.MYSQLHOST || process.env.MYSQL_DB_HOST || process.env.MYSQL_HOST)?.trim() || 'localhost';
-    const rawPort = (process.env.MYSQLPORT || process.env.MYSQL_DB_PORT || process.env.MYSQL_PORT)?.trim();
+    const host = (process.env.MYSQLHOST || process.env.MYSQL_DB_HOST || process.env.MYSQL_HOST || process.env.DB_HOST)?.trim() || 'localhost';
+    const rawPort = (process.env.MYSQLPORT || process.env.MYSQL_DB_PORT || process.env.MYSQL_PORT || process.env.DB_PORT)?.trim();
     const port = rawPort ? parseInt(rawPort, 10) : 3306;
-    const database = (process.env.MYSQLDATABASE || process.env.MYSQL_DB_NAME)?.trim() || 'mediera_workshop_db';
-    const user = (process.env.MYSQLUSER || process.env.MYSQL_DB_USER || process.env.MYSQL_USER)?.trim() || 'root';
+    const database = (process.env.MYSQLDATABASE || process.env.MYSQL_DB_NAME || process.env.DB_NAME)?.trim() || 'medical_crm_new';
+    const user = (process.env.MYSQLUSER || process.env.MYSQL_DB_USER || process.env.MYSQL_USER || process.env.DB_USER)?.trim() || 'root';
     const password =
       process.env.MYSQLPASSWORD !== undefined
         ? process.env.MYSQLPASSWORD
-        : (process.env.MYSQL_DB_PASSWORD || process.env.MYSQL_PASSWORD || '');
+        : (process.env.MYSQL_DB_PASSWORD || process.env.MYSQL_PASSWORD || process.env.DB_PASSWORD || '');
 
     return {
       dialect: 'mysql',
@@ -106,15 +124,15 @@ export function getDbConfig(): DbConfig {
   }
 
   // PostgreSQL dialect
-  const host = (process.env.PGHOST || process.env.SQL_HOST || process.env.DB_HOST)?.trim() || 'localhost';
-  const rawPort = (process.env.PGPORT || process.env.SQL_PORT || process.env.DB_PORT)?.trim();
+  const host = (process.env.PGHOST || process.env.PG_HOST || process.env.POSTGRES_HOST || process.env.DB_HOST || process.env.SQL_HOST)?.trim() || 'localhost';
+  const rawPort = (process.env.PGPORT || process.env.PG_PORT || process.env.POSTGRES_PORT || process.env.DB_PORT || process.env.SQL_PORT)?.trim();
   const port = rawPort ? parseInt(rawPort, 10) : 5432;
-  const database = (process.env.PGDATABASE || process.env.SQL_DB_NAME || process.env.DB_NAME)?.trim() || 'mediera_workshop_db';
-  const user = (process.env.PGUSER || process.env.SQL_USER || process.env.DB_USER)?.trim() || 'postgres';
+  const database = (process.env.PGDATABASE || process.env.PG_DATABASE || process.env.POSTGRES_DB || process.env.DB_NAME || process.env.SQL_DB_NAME)?.trim() || 'medical_crm_new';
+  const user = (process.env.PGUSER || process.env.PG_USER || process.env.POSTGRES_USER || process.env.DB_USER || process.env.SQL_USER)?.trim() || 'postgres';
   const password =
     process.env.PGPASSWORD !== undefined
       ? process.env.PGPASSWORD
-      : (process.env.SQL_PASSWORD || process.env.DB_PASSWORD || '');
+      : (process.env.PG_PASSWORD || process.env.POSTGRES_PASSWORD || process.env.DB_PASSWORD || process.env.SQL_PASSWORD || '');
 
   return {
     dialect: 'postgres',
@@ -138,7 +156,7 @@ export function getSafeConfig(config: DbConfig) {
   );
 
   return {
-    dialect: config.dialect === 'postgres' ? 'PostgreSQL' : 'MySQL',
+    dialect: config.dialect === 'mysql' ? 'MySQL' : 'PostgreSQL',
     rawDialect: config.dialect,
     database: config.database,
     host: config.host,

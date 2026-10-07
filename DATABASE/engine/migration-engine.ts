@@ -97,7 +97,7 @@ export function discoverMigrationFiles(): MigrationFile[] {
 }
 
 /**
- * Splits SQL script by semicolons while respecting quotes
+ * Splits SQL script by semicolons while respecting quotes, string literals, and SQL comments
  */
 export function splitSqlStatements(sql: string): string[] {
   const statements: string[] = [];
@@ -108,10 +108,40 @@ export function splitSqlStatements(sql: string): string[] {
 
   for (let i = 0; i < sql.length; i++) {
     const char = sql[i];
+    const next = i + 1 < sql.length ? sql[i + 1] : '';
     const prev = i > 0 ? sql[i - 1] : '';
 
-    if (char === "'" && !inDoubleQuote && !inBacktick && prev !== '\\') {
-      inSingleQuote = !inSingleQuote;
+    // Handle comments strictly outside quotes
+    if (!inSingleQuote && !inDoubleQuote && !inBacktick) {
+      if (char === '-' && next === '-') {
+        // Single-line comment: advance to end of line
+        while (i < sql.length && sql[i] !== '\n') {
+          i++;
+        }
+        current += ' ';
+        continue;
+      }
+      if (char === '/' && next === '*') {
+        // Block comment: advance to end of comment block
+        i += 2;
+        while (i < sql.length && !(sql[i] === '*' && sql[i + 1] === '/')) {
+          i++;
+        }
+        i++; // skip closing '/'
+        current += ' ';
+        continue;
+      }
+    }
+
+    if (char === "'" && !inDoubleQuote && !inBacktick) {
+      if (inSingleQuote && next === "'") {
+        current += "''";
+        i++;
+        continue;
+      }
+      if (prev !== '\\') {
+        inSingleQuote = !inSingleQuote;
+      }
     } else if (char === '"' && !inSingleQuote && !inBacktick && prev !== '\\') {
       inDoubleQuote = !inDoubleQuote;
     } else if (char === '`' && !inSingleQuote && !inDoubleQuote && prev !== '\\') {
@@ -120,7 +150,7 @@ export function splitSqlStatements(sql: string): string[] {
 
     if (char === ';' && !inSingleQuote && !inDoubleQuote && !inBacktick) {
       const trimmed = current.trim();
-      if (trimmed.length > 0 && !trimmed.startsWith('--')) {
+      if (trimmed.length > 0) {
         statements.push(trimmed);
       }
       current = '';
@@ -130,7 +160,7 @@ export function splitSqlStatements(sql: string): string[] {
   }
 
   const remainder = current.trim();
-  if (remainder.length > 0 && !remainder.startsWith('--')) {
+  if (remainder.length > 0) {
     statements.push(remainder);
   }
 
@@ -162,16 +192,25 @@ export function translateSqlForMysql(sql: string): string {
   // 6. MySQL syntax for CREATE INDEX IF NOT EXISTS -> CREATE INDEX
   s = s.replace(/\bCREATE\s+(UNIQUE\s+)?INDEX\s+IF\s+NOT\s+EXISTS\b/gi, 'CREATE $1INDEX');
 
-  // 7. ON CONFLICT (col) DO NOTHING -> ON DUPLICATE KEY UPDATE col = col
+  // 7. Replace ILIKE with standard case-insensitive LIKE
+  s = s.replace(/\bILIKE\b/gi, 'LIKE');
+
+  // 8. Replace PostgreSQL TIMESTAMPTZ with TIMESTAMP
+  s = s.replace(/\bTIMESTAMPTZ\b/gi, 'TIMESTAMP');
+
+  // 9. Replace UUID with VARCHAR(36)
+  s = s.replace(/\bUUID\b/gi, 'VARCHAR(36)');
+
+  // 10. ON CONFLICT (col) DO NOTHING / ON CONFLICT DO NOTHING -> ON DUPLICATE KEY UPDATE col = col
   s = s.replace(
-    /ON\s+CONFLICT\s*\(([^)]+)\)\s*DO\s+NOTHING/gi,
-    (_match, cols) => {
-      const firstCol = cols.split(',')[0].trim();
+    /ON\s+CONFLICT\s*(\(([^)]+)\))?\s*DO\s+NOTHING/gi,
+    (_match, _p1, cols) => {
+      const firstCol = cols ? cols.split(',')[0].trim() : 'id';
       return `ON DUPLICATE KEY UPDATE ${firstCol} = ${firstCol}`;
     }
   );
 
-  // 8. ON CONFLICT (col) DO UPDATE SET ... -> ON DUPLICATE KEY UPDATE ...
+  // 11. ON CONFLICT (col) DO UPDATE SET ... -> ON DUPLICATE KEY UPDATE ...
   s = s.replace(
     /ON\s+CONFLICT\s*\([^)]+\)\s*DO\s+UPDATE\s+SET\s+([\s\S]*?)(?=;|$)/gi,
     (_match, updateClause) => {
@@ -180,7 +219,7 @@ export function translateSqlForMysql(sql: string): string {
     }
   );
 
-  // 9. ALTER TABLE ... ADD COLUMN IF NOT EXISTS -> ADD COLUMN (if needed)
+  // 12. ALTER TABLE ... ADD COLUMN IF NOT EXISTS -> ADD COLUMN (if needed)
   s = s.replace(/ADD\s+COLUMN\s+IF\s+NOT\s+EXISTS/gi, 'ADD COLUMN');
 
   return s;
@@ -215,7 +254,7 @@ export class MigrationEngine {
       const latencyMs = Date.now() - start;
       return {
         connected: true,
-        provider: safe.dialect === 'mysql' ? 'MySQL' : 'PostgreSQL',
+        provider: safe.dialect,
         host: safe.host,
         port: safe.port,
         database: safe.database,
@@ -225,7 +264,7 @@ export class MigrationEngine {
     } catch (err: any) {
       return {
         connected: false,
-        provider: safe.dialect === 'mysql' ? 'MySQL' : 'PostgreSQL',
+        provider: safe.dialect,
         host: safe.host,
         port: safe.port,
         database: safe.database,
@@ -444,10 +483,19 @@ export class MigrationEngine {
               try {
                 await this.client.execute(stmt);
               } catch (stmtErr: any) {
+                const msg = String(stmtErr.message || '').toLowerCase();
+                const code = stmtErr.code;
+                const errno = stmtErr.errno;
                 if (
-                  stmtErr.message?.includes('Duplicate key name') ||
-                  stmtErr.message?.includes('Duplicate column name') ||
-                  stmtErr.message?.includes('already exists')
+                  code === 'ER_DUP_FIELDNAME' ||
+                  code === 'ER_DUP_KEYNAME' ||
+                  code === 'ER_TABLE_EXISTS_ERROR' ||
+                  errno === 1060 ||
+                  errno === 1061 ||
+                  errno === 1050 ||
+                  msg.includes('duplicate key name') ||
+                  msg.includes('duplicate column name') ||
+                  msg.includes('already exists')
                 ) {
                   // Ignore safe idempotent duplicate notices in MySQL
                   continue;
