@@ -56,10 +56,79 @@ apiRouter.get('/auth/me', authenticate, (req, res) =>
 apiRouter.post('/auth/logout', (req, res) =>
   authController.logout(req, res)
 );
+apiRouter.post('/auth/forgot-password', (req, res) =>
+  authController.forgotPassword(req, res)
+);
+apiRouter.post('/auth/verify-reset-code', (req, res) =>
+  authController.verifyResetCode(req, res)
+);
+apiRouter.post('/auth/reset-password', (req, res) =>
+  authController.resetPassword(req, res)
+);
+apiRouter.post('/auth/change-password', authenticate, (req, res) =>
+  authController.changePassword(req, res)
+);
+apiRouter.patch('/auth/profile', authenticate, (req, res) =>
+  authController.updateProfile(req, res)
+);
+apiRouter.patch('/profile', authenticate, (req, res) =>
+  authController.updateProfile(req, res)
+);
 
 // --- Settings Endpoints ---
 apiRouter.get('/settings', optionalAuthenticate, (req, res) =>
   settingsController.getAllSettings(req, res)
+);
+
+// --- Departments ---
+apiRouter.get('/departments', optionalAuthenticate, (req, res) =>
+  clinicalController.getDepartments(req, res)
+);
+apiRouter.get('/departments/:id', optionalAuthenticate, (req, res) =>
+  clinicalController.getDepartmentById(req, res)
+);
+apiRouter.post('/departments', requireSuperAdmin, (req, res) =>
+  clinicalController.createDepartment(req, res)
+);
+apiRouter.put('/departments/:id', requireSuperAdmin, (req, res) =>
+  clinicalController.updateDepartment(req, res)
+);
+apiRouter.delete('/departments/:id', requireSuperAdmin, (req, res) =>
+  clinicalController.deleteDepartment(req, res)
+);
+
+// --- Designations ---
+apiRouter.get('/designations', optionalAuthenticate, (req, res) =>
+  clinicalController.getDesignations(req, res)
+);
+apiRouter.get('/designations/:id', optionalAuthenticate, (req, res) =>
+  clinicalController.getDesignationById(req, res)
+);
+apiRouter.post('/designations', requireSuperAdmin, (req, res) =>
+  clinicalController.createDesignation(req, res)
+);
+apiRouter.put('/designations/:id', requireSuperAdmin, (req, res) =>
+  clinicalController.updateDesignation(req, res)
+);
+apiRouter.delete('/designations/:id', requireSuperAdmin, (req, res) =>
+  clinicalController.deleteDesignation(req, res)
+);
+
+// --- User Archetypes ---
+apiRouter.get('/user-archetypes', optionalAuthenticate, (req, res) =>
+  clinicalController.getUserArchetypes(req, res)
+);
+apiRouter.get('/user-archetypes/:id', optionalAuthenticate, (req, res) =>
+  clinicalController.getUserArchetypeById(req, res)
+);
+apiRouter.post('/user-archetypes', requireSuperAdmin, (req, res) =>
+  clinicalController.createUserArchetype(req, res)
+);
+apiRouter.put('/user-archetypes/:id', requireSuperAdmin, (req, res) =>
+  clinicalController.updateUserArchetype(req, res)
+);
+apiRouter.delete('/user-archetypes/:id', requireSuperAdmin, (req, res) =>
+  clinicalController.deleteUserArchetype(req, res)
 );
 
 // --- Clinical & ERP Operations ---

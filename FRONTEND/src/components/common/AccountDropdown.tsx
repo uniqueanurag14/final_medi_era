@@ -11,6 +11,10 @@ import {
   LogOut,
   Shield,
   FileText,
+  Globe,
+  Edit3,
+  Camera,
+  KeyRound,
 } from 'lucide-react';
 
 interface AccountDropdownProps {
@@ -109,10 +113,10 @@ export const AccountDropdown: React.FC<AccountDropdownProps> = ({
           {isLoggedIn && (
             <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 mb-1">
               <p className="font-extrabold text-slate-900 dark:text-white truncate text-sm">
-                {currentUser?.name}
+                {currentUser?.name} {isPatient ? '(Patient)' : `(${currentUser?.roleDisplayName || currentRole?.replace('_', ' ')})`}
               </p>
-              <p className="text-[10px] text-teal-600 dark:text-teal-400 font-bold tracking-wide uppercase mt-0.5">
-                {isPatient ? 'Patient Portal' : currentRole?.replace('_', ' ')}
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5 font-normal">
+                {currentUser?.email}
               </p>
             </div>
           )}
@@ -147,7 +151,7 @@ export const AccountDropdown: React.FC<AccountDropdownProps> = ({
               <button
                 type="button"
                 id="account-patient-register-link"
-                onClick={() => handleNavigate('/registration')}
+                onClick={() => handleNavigate('/register')}
                 className="w-full text-left px-4 py-2 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2.5 font-semibold text-slate-800 dark:text-slate-200 cursor-pointer"
               >
                 <UserPlus className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
@@ -159,15 +163,15 @@ export const AccountDropdown: React.FC<AccountDropdownProps> = ({
 
               <div className="border-t border-slate-100 dark:border-slate-800 my-1.5" />
 
-              {/* CRM / ERP Staff Login link */}
+              {/* Admin / Backoffice Login link */}
               <button
                 type="button"
-                id="account-erp-login-link"
-                onClick={() => handleNavigate('/erp/login')}
+                id="account-admin-login-link"
+                onClick={() => handleNavigate('/admin/login')}
                 className="w-full text-left px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-600 dark:text-slate-400 font-medium cursor-pointer text-[11px]"
               >
                 <Shield className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
-                <span>Go to ERP / CRM Login</span>
+                <span>Admin / Backoffice Sign In</span>
               </button>
             </div>
           )}
@@ -175,78 +179,78 @@ export const AccountDropdown: React.FC<AccountDropdownProps> = ({
           {/* 2. AFTER LOGIN (PATIENT) */}
           {isLoggedIn && isPatient && (
             <div className="space-y-0.5">
-              {/* 1. A ) Patient Dashboard */}
+              {/* View Public Website */}
               <button
                 type="button"
-                id="patient-dashboard-link"
-                onClick={() => handleNavigate('/dashboard')}
-                className="w-full text-left px-4 py-2 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2.5 font-bold text-teal-700 dark:text-teal-400 cursor-pointer"
+                id="patient-view-website-link"
+                onClick={() => handleNavigate('/')}
+                className="w-full text-left px-4 py-2 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2.5 font-semibold text-slate-800 dark:text-slate-200 cursor-pointer"
               >
-                <LayoutDashboard className="w-4 h-4 shrink-0" />
-                <span>Patient Dashboard</span>
+                <Globe className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
+                <span>View Public Website</span>
               </button>
 
-              {/* 1. B ) My Profile */}
+              {/* My Profile */}
               <button
                 type="button"
                 id="patient-profile-link"
                 onClick={() => handleNavigate('/profile')}
-                className="w-full text-left px-4 py-2 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2.5 font-semibold text-slate-800 dark:text-slate-200 cursor-pointer"
+                className="w-full text-left px-4 py-2 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2.5 font-bold text-slate-900 dark:text-white cursor-pointer"
               >
                 <User className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
                 <span>My Profile</span>
               </button>
 
-              {/* 1. C ) My Appointments */}
-              <button
-                type="button"
-                id="patient-appointments-link"
-                onClick={() => handleNavigate('/appointments')}
-                className="w-full text-left px-4 py-2 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2.5 font-semibold text-slate-800 dark:text-slate-200 cursor-pointer"
-              >
-                <Calendar className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
-                <span>My Appointments</span>
-              </button>
+              {/* My Profile Tree Sub-items */}
+              <div className="pl-6 pr-2 py-0.5 space-y-0.5 border-l-2 border-teal-500/20 ml-5 my-0.5">
+                <button
+                  type="button"
+                  id="patient-edit-profile-sublink"
+                  onClick={() => handleNavigate('/profile?tab=edit')}
+                  className="w-full text-left px-3 py-1.5 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2 text-[11px] font-medium text-slate-700 dark:text-slate-300 rounded-lg cursor-pointer"
+                >
+                  <Edit3 className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
+                  <span>Edit Profile</span>
+                </button>
+                <button
+                  type="button"
+                  id="patient-edit-picture-sublink"
+                  onClick={() => handleNavigate('/profile?tab=avatar')}
+                  className="w-full text-left px-3 py-1.5 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2 text-[11px] font-medium text-slate-700 dark:text-slate-300 rounded-lg cursor-pointer"
+                >
+                  <Camera className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
+                  <span>Edit Profile Picture</span>
+                </button>
+                <button
+                  type="button"
+                  id="patient-change-password-sublink"
+                  onClick={() => handleNavigate('/profile?tab=password')}
+                  className="w-full text-left px-3 py-1.5 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2 text-[11px] font-medium text-slate-700 dark:text-slate-300 rounded-lg cursor-pointer"
+                >
+                  <KeyRound className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
+                  <span>Change Password</span>
+                </button>
+                <button
+                  type="button"
+                  id="patient-access-roles-sublink"
+                  onClick={() => handleNavigate('/profile?tab=roles')}
+                  className="w-full text-left px-3 py-1.5 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2 text-[11px] font-medium text-slate-700 dark:text-slate-300 rounded-lg cursor-pointer"
+                >
+                  <Shield className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
+                  <span>Access Roles</span>
+                </button>
+              </div>
 
-              {/* 1. D ) Book Appointment */}
-              <button
-                type="button"
-                id="patient-book-appointment-link"
-                onClick={() => {
-                  setIsOpen(false);
-                  if (onOpenBookingModal) {
-                    onOpenBookingModal();
-                  } else {
-                    onNavigate('/book-appointment');
-                  }
-                }}
-                className="w-full text-left px-4 py-2 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2.5 font-semibold text-slate-800 dark:text-slate-200 cursor-pointer"
-              >
-                <CalendarPlus className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
-                <span>Book Appointment</span>
-              </button>
-
-              {/* etc ... Invoices & Payments */}
-              <button
-                type="button"
-                id="patient-invoices-link"
-                onClick={() => handleNavigate('/dashboard')}
-                className="w-full text-left px-4 py-2 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2.5 font-semibold text-slate-800 dark:text-slate-200 cursor-pointer"
-              >
-                <FileText className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
-                <span>Invoices &amp; Payments</span>
-              </button>
-
+              {/* Sign Out */}
               <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
-
               <button
                 type="button"
-                id="patient-logout-btn"
+                id="patient-signout-btn"
                 onClick={handleLogout}
-                className="w-full text-left px-4 py-2 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center gap-2.5 font-semibold cursor-pointer"
+                className="w-full text-left px-4 py-2 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 flex items-center gap-2.5 font-bold cursor-pointer"
               >
                 <LogOut className="w-4 h-4 shrink-0" />
-                <span>Logout</span>
+                <span>Sign Out</span>
               </button>
             </div>
           )}

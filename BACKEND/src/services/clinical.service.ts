@@ -182,6 +182,84 @@ export class ClinicalService {
   public async payInvoice(id: string, amount: number, paymentMethod: string = 'Online'): Promise<DbInvoice | null> {
     return invoiceRepository.recordPayment(id, amount, paymentMethod);
   }
+
+  // --- Departments ---
+  public async getDepartments() {
+    const { clinicalEntitiesRepository } = await import('../repositories/clinical-entities.repository');
+    return clinicalEntitiesRepository.getDepartments();
+  }
+
+  public async getDepartmentById(id: string) {
+    const { clinicalEntitiesRepository } = await import('../repositories/clinical-entities.repository');
+    return clinicalEntitiesRepository.getDepartmentById(id);
+  }
+
+  public async createDepartment(data: { name: string; code?: string; description?: string; active?: boolean }) {
+    const { clinicalEntitiesRepository } = await import('../repositories/clinical-entities.repository');
+    return clinicalEntitiesRepository.createDepartment(data);
+  }
+
+  public async updateDepartment(id: string, data: any) {
+    const { clinicalEntitiesRepository } = await import('../repositories/clinical-entities.repository');
+    return clinicalEntitiesRepository.updateDepartment(id, data);
+  }
+
+  public async deleteDepartment(id: string) {
+    const { clinicalEntitiesRepository } = await import('../repositories/clinical-entities.repository');
+    return clinicalEntitiesRepository.deleteDepartment(id);
+  }
+
+  // --- Designations ---
+  public async getDesignations() {
+    const { clinicalEntitiesRepository } = await import('../repositories/clinical-entities.repository');
+    return clinicalEntitiesRepository.getDesignations();
+  }
+
+  public async getDesignationById(id: string) {
+    const { clinicalEntitiesRepository } = await import('../repositories/clinical-entities.repository');
+    return clinicalEntitiesRepository.getDesignationById(id);
+  }
+
+  public async createDesignation(data: any) {
+    const { clinicalEntitiesRepository } = await import('../repositories/clinical-entities.repository');
+    return clinicalEntitiesRepository.createDesignation(data);
+  }
+
+  public async updateDesignation(id: string, data: any) {
+    const { clinicalEntitiesRepository } = await import('../repositories/clinical-entities.repository');
+    return clinicalEntitiesRepository.updateDesignation(id, data);
+  }
+
+  public async deleteDesignation(id: string) {
+    const { clinicalEntitiesRepository } = await import('../repositories/clinical-entities.repository');
+    return clinicalEntitiesRepository.deleteDesignation(id);
+  }
+
+  // --- User Archetypes ---
+  public async getUserArchetypes() {
+    const { clinicalEntitiesRepository } = await import('../repositories/clinical-entities.repository');
+    return clinicalEntitiesRepository.getUserArchetypes();
+  }
+
+  public async getUserArchetypeById(id: string) {
+    const { clinicalEntitiesRepository } = await import('../repositories/clinical-entities.repository');
+    return clinicalEntitiesRepository.getUserArchetypeById(id);
+  }
+
+  public async createUserArchetype(data: any) {
+    const { clinicalEntitiesRepository } = await import('../repositories/clinical-entities.repository');
+    return clinicalEntitiesRepository.createUserArchetype(data);
+  }
+
+  public async updateUserArchetype(id: string, data: any) {
+    const { clinicalEntitiesRepository } = await import('../repositories/clinical-entities.repository');
+    return clinicalEntitiesRepository.updateUserArchetype(id, data);
+  }
+
+  public async deleteUserArchetype(id: string) {
+    const { clinicalEntitiesRepository } = await import('../repositories/clinical-entities.repository');
+    return clinicalEntitiesRepository.deleteUserArchetype(id);
+  }
 }
 
 export const clinicalService = new ClinicalService();

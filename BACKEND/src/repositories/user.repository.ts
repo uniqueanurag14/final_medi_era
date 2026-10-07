@@ -563,6 +563,102 @@ export class UserRepository {
     // If no password_hash stored yet (initial seeded records) allow authenticate
     return true;
   }
+
+  public async createPasswordReset(email: string, roleContext?: string): Promise<{ token: string; code: string; user: DbUserWithBranches | null }> {
+    const user = await this.findByEmail(email);
+    const token = crypto.randomBytes(24).toString('hex');
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const expiry = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
+
+    if (user) {
+      await dbAdapter.query(
+        `UPDATE users SET setup_token = $1, setup_token_expires_at = $2 WHERE id = $3`,
+        [`${token}:${code}`, expiry.toISOString(), user.id]
+      );
+    }
+    return { token, code, user };
+  }
+
+  public async verifyPasswordReset(tokenOrCode: string, email?: string): Promise<{ valid: boolean; user?: DbUserWithBranches }> {
+    const clean = tokenOrCode.trim();
+    let user: DbUserWithBranches | null = null;
+
+    if (email) {
+      const dbUser = await this.findByEmail(email);
+      if (dbUser && dbUser.setupToken) {
+        const parts = dbUser.setupToken.split(':');
+        const tokenPart = parts[0];
+        const codePart = parts[1] || parts[0];
+        if (clean === tokenPart || clean === codePart || clean === dbUser.setupToken) {
+          user = dbUser;
+        }
+      }
+    }
+
+    if (!user) {
+      const sql = `
+        SELECT id, setup_token FROM users
+        WHERE setup_token LIKE $1 AND setup_token_expires_at > CURRENT_TIMESTAMP
+        LIMIT 1;
+      `;
+      const res = await dbAdapter.query<{ id: string }>(sql, [`%${clean}%`]);
+      if (res.rows.length > 0) {
+        user = await this.findById(res.rows[0].id);
+      }
+    }
+
+    if (!user) return { valid: false };
+    return { valid: true, user };
+  }
+
+  public async resetPasswordWithTokenOrCode(tokenOrCode: string, newPassword: string, email?: string): Promise<boolean> {
+    const { valid, user } = await this.verifyPasswordReset(tokenOrCode, email);
+    if (!valid || !user) return false;
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    await dbAdapter.query(
+      `UPDATE users SET password_hash = $1, setup_token = NULL, setup_token_expires_at = NULL WHERE id = $2`,
+      [passwordHash, user.id]
+    );
+    return true;
+  }
+
+  public async updateUserPassword(userId: string, currentPassword: string, newPassword: string): Promise<{ success: boolean; error?: string }> {
+    const user = await this.findById(userId);
+    if (!user) return { success: false, error: 'User not found.' };
+
+    const valid = await this.verifyPassword(user, currentPassword);
+    if (!valid) return { success: false, error: 'Incorrect current password.' };
+
+    const passwordHash = await bcrypt.hash(newPassword, 12);
+    await dbAdapter.query(`UPDATE users SET password_hash = $1 WHERE id = $2`, [passwordHash, userId]);
+    return { success: true };
+  }
+
+  public async updateUserProfile(userId: string, updates: { name?: string; phone?: string; avatarUrl?: string }): Promise<DbUserWithBranches | null> {
+    const sets: string[] = [];
+    const params: any[] = [];
+    let idx = 1;
+
+    if (updates.name !== undefined) {
+      sets.push(`name = $${idx++}`);
+      params.push(updates.name);
+    }
+    if (updates.phone !== undefined) {
+      sets.push(`phone = $${idx++}`);
+      params.push(updates.phone);
+    }
+    if (updates.avatarUrl !== undefined) {
+      sets.push(`avatar_url = $${idx++}`);
+      params.push(updates.avatarUrl);
+    }
+
+    if (sets.length === 0) return this.findById(userId);
+
+    params.push(userId);
+    await dbAdapter.query(`UPDATE users SET ${sets.join(', ')} WHERE id = $${idx}`, params);
+    return this.findById(userId);
+  }
 }
 
 export const userRepository = new UserRepository();

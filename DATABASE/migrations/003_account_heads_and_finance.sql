@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS account_groups (
   code VARCHAR(32) NOT NULL UNIQUE,
   name VARCHAR(128) NOT NULL UNIQUE,
   category TEXT NOT NULL,
-  normal_balance TEXT DEFAULT 'Debit' NOT NULL,
+  normal_balance VARCHAR(32) DEFAULT 'Debit' NOT NULL,
   description TEXT,
   is_system BOOLEAN DEFAULT TRUE NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS account_heads (
   code VARCHAR(32) NOT NULL UNIQUE,
   name TEXT NOT NULL,
   description TEXT,
-  currency TEXT DEFAULT 'USD' NOT NULL,
+  currency VARCHAR(16) DEFAULT 'USD' NOT NULL,
   current_balance NUMERIC(14, 2) DEFAULT 0.00 NOT NULL,
   is_system BOOLEAN DEFAULT FALSE NOT NULL,
   active BOOLEAN DEFAULT TRUE NOT NULL,
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS journal_entries (
   reference_id TEXT,
   description TEXT NOT NULL,
   total_amount NUMERIC(14, 2) NOT NULL,
-  status TEXT DEFAULT 'Posted' NOT NULL,
+  status VARCHAR(32) DEFAULT 'Posted' NOT NULL,
   posted_by TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 );

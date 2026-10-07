@@ -11,6 +11,8 @@
     "clean": "rm -rf dist server.js",
     "db:init": "tsx SCRIPTS/db-init.ts",
     "db-init": "tsx SCRIPTS/db-init.ts",
+    "db:update": "tsx SCRIPTS/db-update.ts",
+    "db-update": "tsx SCRIPTS/db-update.ts",
     "db:migrate": "tsx SCRIPTS/db-migrate.ts",
     "db-migrate": "tsx SCRIPTS/db-migrate.ts",
     "db:status": "tsx SCRIPTS/db-status.ts",

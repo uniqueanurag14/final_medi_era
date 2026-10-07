@@ -149,6 +149,61 @@ export class ClinicalEntitiesRepository {
     }
   }
 
+  public async getDepartmentById(id: string): Promise<DbDepartment | null> {
+    try {
+      const sql = `SELECT id, name, code, description, active FROM departments WHERE id = $1 LIMIT 1;`;
+      const res = await dbAdapter.query<DbDepartment>(sql, [id]);
+      return res.rows[0] || null;
+    } catch {
+      return null;
+    }
+  }
+
+  public async createDepartment(data: { name: string; code?: string; description?: string; active?: boolean }): Promise<DbDepartment> {
+    const id = `dept-${Date.now()}`;
+    const code = data.code || `DEPT-${Math.floor(100 + Math.random() * 900)}`;
+    const active = data.active !== false;
+    await dbAdapter.query(
+      `INSERT INTO departments (id, name, code, description, active) VALUES ($1, $2, $3, $4, $5)`,
+      [id, data.name, code, data.description || '', active]
+    );
+    return { id, name: data.name, code, description: data.description || '', active };
+  }
+
+  public async updateDepartment(id: string, updates: Partial<DbDepartment>): Promise<DbDepartment | null> {
+    const sets: string[] = [];
+    const params: any[] = [];
+    let idx = 1;
+
+    if (updates.name !== undefined) {
+      sets.push(`name = $${idx++}`);
+      params.push(updates.name);
+    }
+    if (updates.code !== undefined) {
+      sets.push(`code = $${idx++}`);
+      params.push(updates.code);
+    }
+    if (updates.description !== undefined) {
+      sets.push(`description = $${idx++}`);
+      params.push(updates.description);
+    }
+    if (updates.active !== undefined) {
+      sets.push(`active = $${idx++}`);
+      params.push(updates.active);
+    }
+
+    if (sets.length > 0) {
+      params.push(id);
+      await dbAdapter.query(`UPDATE departments SET ${sets.join(', ')} WHERE id = $${idx}`, params);
+    }
+    return this.getDepartmentById(id);
+  }
+
+  public async deleteDepartment(id: string): Promise<boolean> {
+    const res = await dbAdapter.query(`DELETE FROM departments WHERE id = $1`, [id]);
+    return (res.rowCount || 0) > 0;
+  }
+
   // --- Staff & Employees ---
   public async getStaff(): Promise<DbStaff[]> {
     try {
@@ -223,6 +278,132 @@ export class ClinicalEntitiesRepository {
     } catch {
       return [];
     }
+  }
+
+  // --- Designations ---
+  public async getDesignations(): Promise<any[]> {
+    try {
+      const { settingsRepository } = await import('./settings.repository');
+      const all = await settingsRepository.getAllSettings();
+      if (all['system_designations'] && Array.isArray(all['system_designations'])) {
+        return all['system_designations'];
+      }
+    } catch {
+      // fallback
+    }
+    return [
+      { id: 'des-01', name: 'Chief Medical Officer', code: 'DES-CMO', department: 'Executive Management', active: true },
+      { id: 'des-02', name: 'Senior Consultant Physician', code: 'DES-SCP', department: 'Internal Medicine', active: true },
+      { id: 'des-03', name: 'Clinical Specialist', code: 'DES-CS', department: 'Cardiology', active: true },
+      { id: 'des-04', name: 'Head Nurse / Matron', code: 'DES-HN', department: 'Emergency & Critical Care', active: true },
+      { id: 'des-05', name: 'Registered Staff Nurse', code: 'DES-RN', department: 'Inpatient Care', active: true },
+      { id: 'des-06', name: 'Lead Pharmacist', code: 'DES-LP', department: 'Pharmacy', active: true },
+      { id: 'des-07', name: 'Laboratory Director', code: 'DES-LD', department: 'Pathology & Diagnostics', active: true },
+      { id: 'des-08', name: 'Senior Front Desk Officer', code: 'DES-FDO', department: 'Front Desk & Reception', active: true },
+      { id: 'des-09', name: 'Billing Executive', code: 'DES-BE', department: 'Finance & Accounts', active: true },
+    ];
+  }
+
+  public async getDesignationById(id: string): Promise<any | null> {
+    const list = await this.getDesignations();
+    return list.find((d: any) => d.id === id) || null;
+  }
+
+  public async createDesignation(data: any): Promise<any> {
+    const list = await this.getDesignations();
+    const newDes = {
+      id: `des-${Date.now()}`,
+      name: data.name,
+      code: data.code || `DES-${Math.floor(100 + Math.random() * 900)}`,
+      department: data.department || 'General Practice',
+      description: data.description || '',
+      active: data.active !== false,
+    };
+    const updated = [newDes, ...list];
+    const { settingsRepository } = await import('./settings.repository');
+    await settingsRepository.setSetting('system', 'system_designations', updated);
+    return newDes;
+  }
+
+  public async updateDesignation(id: string, updates: any): Promise<any | null> {
+    const list = await this.getDesignations();
+    const idx = list.findIndex((d: any) => d.id === id);
+    if (idx === -1) return null;
+    list[idx] = { ...list[idx], ...updates };
+    const { settingsRepository } = await import('./settings.repository');
+    await settingsRepository.setSetting('system', 'system_designations', list);
+    return list[idx];
+  }
+
+  public async deleteDesignation(id: string): Promise<boolean> {
+    const list = await this.getDesignations();
+    const filtered = list.filter((d: any) => d.id !== id);
+    const { settingsRepository } = await import('./settings.repository');
+    await settingsRepository.setSetting('system', 'system_designations', filtered);
+    return true;
+  }
+
+  // --- User Archetypes ---
+  public async getUserArchetypes(): Promise<any[]> {
+    try {
+      const { settingsRepository } = await import('./settings.repository');
+      const all = await settingsRepository.getAllSettings();
+      if (all['system_archetypes'] && Array.isArray(all['system_archetypes'])) {
+        return all['system_archetypes'];
+      }
+    } catch {
+      // fallback
+    }
+    return [
+      { id: 'arch-01', name: 'Doctor', code: 'ARCH-DOC', category: 'Clinical', description: 'Licensed medical practitioner responsible for diagnoses, consultations, and prescriptions.', isSystem: true, active: true },
+      { id: 'arch-02', name: 'Nurse', code: 'ARCH-NRS', category: 'Clinical', description: 'Clinical nursing practitioner performing patient triage, vitals recording, and care support.', isSystem: true, active: true },
+      { id: 'arch-03', name: 'Receptionist', code: 'ARCH-RCP', category: 'Administrative', description: 'Front-desk personnel handling patient registration, scheduling, and live room queues.', isSystem: true, active: true },
+      { id: 'arch-04', name: 'Pharmacist', code: 'ARCH-PHR', category: 'Clinical', description: 'Medical pharmacy officer responsible for formulary, dispensing, and stock ledgers.', isSystem: true, active: true },
+      { id: 'arch-05', name: 'Lab Technician', code: 'ARCH-LAB', category: 'Clinical', description: 'Diagnostic pathology personnel running tests and uploading lab reports.', isSystem: true, active: true },
+      { id: 'arch-06', name: 'Accountant', code: 'ARCH-ACC', category: 'Administrative', description: 'Financial officer managing payments, invoice reconciliation, and revenue analytics.', isSystem: true, active: true },
+      { id: 'arch-07', name: 'Clinic Administrator', code: 'ARCH-ADM', category: 'Administrative', description: 'Branch-level operational manager overseeing clinical and administrative workflows.', isSystem: true, active: true },
+      { id: 'arch-08', name: 'Executive Super Admin', code: 'ARCH-SAD', category: 'Administrative', description: 'Full system governance authority across all branches, organizations, and security policies.', isSystem: true, active: true },
+    ];
+  }
+
+  public async getUserArchetypeById(id: string): Promise<any | null> {
+    const list = await this.getUserArchetypes();
+    return list.find((a: any) => a.id === id) || null;
+  }
+
+  public async createUserArchetype(data: any): Promise<any> {
+    const list = await this.getUserArchetypes();
+    const newArch = {
+      id: `arch-${Date.now()}`,
+      name: data.name,
+      code: data.code || `ARCH-${Math.floor(100 + Math.random() * 900)}`,
+      category: data.category || 'Clinical',
+      description: data.description || '',
+      isSystem: false,
+      active: data.active !== false,
+    };
+    const updated = [newArch, ...list];
+    const { settingsRepository } = await import('./settings.repository');
+    await settingsRepository.setSetting('system', 'system_archetypes', updated);
+    return newArch;
+  }
+
+  public async updateUserArchetype(id: string, updates: any): Promise<any | null> {
+    const list = await this.getUserArchetypes();
+    const idx = list.findIndex((a: any) => a.id === id);
+    if (idx === -1) return null;
+    list[idx] = { ...list[idx], ...updates };
+    const { settingsRepository } = await import('./settings.repository');
+    await settingsRepository.setSetting('system', 'system_archetypes', list);
+    return list[idx];
+  }
+
+  public async deleteUserArchetype(id: string): Promise<boolean> {
+    const list = await this.getUserArchetypes();
+    const filtered = list.filter((a: any) => a.id !== id);
+    const { settingsRepository } = await import('./settings.repository');
+    await settingsRepository.setSetting('system', 'system_archetypes', filtered);
+    return true;
   }
 }
 

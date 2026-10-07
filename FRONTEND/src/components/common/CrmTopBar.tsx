@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { dbService } from '../../services/mockDatabase';
 import { ThemeToggle } from './ThemeToggle';
+import { ProfileModal } from '../profile/ProfileModal';
 import {
   Search,
   Bell,
@@ -16,7 +17,12 @@ import {
   Activity,
   CheckCircle2,
   ExternalLink,
-  ChevronDown
+  ChevronDown,
+  Globe,
+  Edit3,
+  Camera,
+  KeyRound,
+  Shield,
 } from 'lucide-react';
 
 interface CrmTopBarProps {
@@ -36,6 +42,8 @@ export const CrmTopBar: React.FC<CrmTopBarProps> = ({
   const [showNotifications, setShowNotifications] = useState(false);
   const [showQuickActions, setShowQuickActions] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [profileModalTab, setProfileModalTab] = useState<'profile' | 'avatar' | 'password' | 'roles'>('profile');
 
   const notifications = dbService.notifications;
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -294,36 +302,124 @@ export const CrmTopBar: React.FC<CrmTopBarProps> = ({
           </button>
 
           {showUserMenu && (
-            <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl py-1.5 z-50 text-xs text-slate-700 dark:text-slate-200">
-              <div className="px-3.5 py-2 border-b border-slate-100 dark:border-slate-800">
-                <p className="font-bold text-slate-900 dark:text-white">{currentUser.name}</p>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{currentUser.email}</p>
+            <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl py-2 z-50 text-xs text-slate-700 dark:text-slate-200 animate-in fade-in slide-in-from-top-2">
+              <div className="px-3.5 py-2.5 border-b border-slate-100 dark:border-slate-800 mb-1">
+                <p className="font-extrabold text-slate-900 dark:text-white truncate text-sm">
+                  {currentUser.name} ({currentUser.roleDisplayName || (currentRole === 'SUPER_ADMIN' ? 'Executive Super Admin' : currentRole.replace('_', ' '))})
+                </p>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">{currentUser.email}</p>
               </div>
+
+              {/* View Public Website */}
               <button
+                type="button"
+                id="crm-view-public-site-link"
                 onClick={() => {
                   setShowUserMenu(false);
-                  onNavigate('public-home');
+                  onNavigate('/');
                 }}
-                className="w-full text-left px-3.5 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 transition-colors"
+                className="w-full text-left px-3.5 py-2 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2.5 font-semibold text-slate-800 dark:text-slate-200 transition-colors cursor-pointer"
               >
-                <ExternalLink className="w-4 h-4 text-slate-400" />
-                View Public Website
+                <Globe className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
+                <span>View Public Website</span>
               </button>
+
+              {/* My Profile */}
               <button
+                type="button"
+                id="crm-my-profile-link"
+                onClick={() => {
+                  setShowUserMenu(false);
+                  setProfileModalTab('profile');
+                  setIsProfileModalOpen(true);
+                }}
+                className="w-full text-left px-3.5 py-2 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2.5 font-bold text-slate-900 dark:text-white transition-colors cursor-pointer"
+              >
+                <User className="w-4 h-4 text-teal-600 dark:text-teal-400 shrink-0" />
+                <span>My Profile</span>
+              </button>
+
+              {/* My Profile Tree Sub-options */}
+              <div className="pl-6 pr-2 py-0.5 space-y-0.5 border-l-2 border-teal-500/20 ml-5 my-0.5">
+                <button
+                  type="button"
+                  id="crm-edit-profile-sublink"
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    setProfileModalTab('profile');
+                    setIsProfileModalOpen(true);
+                  }}
+                  className="w-full text-left px-3 py-1.5 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2 text-[11px] font-medium text-slate-700 dark:text-slate-300 rounded-lg cursor-pointer"
+                >
+                  <Edit3 className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
+                  <span>Edit Profile</span>
+                </button>
+                <button
+                  type="button"
+                  id="crm-edit-picture-sublink"
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    setProfileModalTab('avatar');
+                    setIsProfileModalOpen(true);
+                  }}
+                  className="w-full text-left px-3 py-1.5 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2 text-[11px] font-medium text-slate-700 dark:text-slate-300 rounded-lg cursor-pointer"
+                >
+                  <Camera className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
+                  <span>Edit Profile Picture</span>
+                </button>
+                <button
+                  type="button"
+                  id="crm-change-password-sublink"
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    setProfileModalTab('password');
+                    setIsProfileModalOpen(true);
+                  }}
+                  className="w-full text-left px-3 py-1.5 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2 text-[11px] font-medium text-slate-700 dark:text-slate-300 rounded-lg cursor-pointer"
+                >
+                  <KeyRound className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
+                  <span>Change Password</span>
+                </button>
+                <button
+                  type="button"
+                  id="crm-access-roles-sublink"
+                  onClick={() => {
+                    setShowUserMenu(false);
+                    setProfileModalTab('roles');
+                    setIsProfileModalOpen(true);
+                  }}
+                  className="w-full text-left px-3 py-1.5 hover:bg-teal-50 dark:hover:bg-slate-800 flex items-center gap-2 text-[11px] font-medium text-slate-700 dark:text-slate-300 rounded-lg cursor-pointer"
+                >
+                  <Shield className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
+                  <span>Access Roles</span>
+                </button>
+              </div>
+
+              {/* Sign Out */}
+              <div className="border-t border-slate-100 dark:border-slate-800 my-1" />
+              <button
+                type="button"
+                id="crm-signout-btn"
                 onClick={() => {
                   setShowUserMenu(false);
                   logout();
-                  onNavigate('public-login');
+                  onNavigate('/admin/login');
                 }}
-                className="w-full text-left px-3.5 py-2 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-700 dark:text-rose-400 flex items-center gap-2 border-t border-slate-100 dark:border-slate-800 transition-colors"
+                className="w-full text-left px-3.5 py-2 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-700 dark:text-rose-400 flex items-center gap-2 transition-colors font-bold cursor-pointer"
               >
-                <LogOut className="w-4 h-4" />
-                Sign Out
+                <LogOut className="w-4 h-4 shrink-0" />
+                <span>Sign Out</span>
               </button>
             </div>
           )}
         </div>
       </div>
+
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        initialTab={profileModalTab}
+      />
     </header>
   );
 };

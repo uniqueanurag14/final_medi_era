@@ -239,7 +239,155 @@ export class ClinicalController {
       return res.status(500).json({ success: false, error: err.message });
     }
   }
-}
 
+  // --- Departments ---
+  public async getDepartments(req: AuthenticatedRequest, res: Response) {
+    try {
+      const data = await clinicalService.getDepartments();
+      return res.json({ success: true, count: data.length, data });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  public async getDepartmentById(req: AuthenticatedRequest, res: Response) {
+    try {
+      const data = await clinicalService.getDepartmentById(req.params.id);
+      if (!data) return res.status(404).json({ success: false, error: 'Department not found' });
+      return res.json({ success: true, data });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  public async createDepartment(req: AuthenticatedRequest, res: Response) {
+    try {
+      const { name, code, description, active } = req.body;
+      if (!name) return res.status(400).json({ success: false, error: 'Department name is required' });
+      const data = await clinicalService.createDepartment({ name, code, description, active });
+      return res.status(201).json({ success: true, data });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  public async updateDepartment(req: AuthenticatedRequest, res: Response) {
+    try {
+      const data = await clinicalService.updateDepartment(req.params.id, req.body);
+      if (!data) return res.status(404).json({ success: false, error: 'Department not found' });
+      return res.json({ success: true, data });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  public async deleteDepartment(req: AuthenticatedRequest, res: Response) {
+    try {
+      const success = await clinicalService.deleteDepartment(req.params.id);
+      if (!success) return res.status(404).json({ success: false, error: 'Department not found' });
+      return res.json({ success: true, message: 'Department deleted successfully' });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  // --- Designations ---
+  public async getDesignations(req: AuthenticatedRequest, res: Response) {
+    try {
+      const data = await clinicalService.getDesignations();
+      return res.json({ success: true, count: data.length, data });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  public async getDesignationById(req: AuthenticatedRequest, res: Response) {
+    try {
+      const data = await clinicalService.getDesignationById(req.params.id);
+      if (!data) return res.status(404).json({ success: false, error: 'Designation not found' });
+      return res.json({ success: true, data });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  public async createDesignation(req: AuthenticatedRequest, res: Response) {
+    try {
+      const data = await clinicalService.createDesignation(req.body);
+      return res.status(201).json({ success: true, data });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  public async updateDesignation(req: AuthenticatedRequest, res: Response) {
+    try {
+      const data = await clinicalService.updateDesignation(req.params.id, req.body);
+      if (!data) return res.status(404).json({ success: false, error: 'Designation not found' });
+      return res.json({ success: true, data });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  public async deleteDesignation(req: AuthenticatedRequest, res: Response) {
+    try {
+      const success = await clinicalService.deleteDesignation(req.params.id);
+      if (!success) return res.status(404).json({ success: false, error: 'Designation not found' });
+      return res.json({ success: true, message: 'Designation deleted successfully' });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  // --- User Archetypes ---
+  public async getUserArchetypes(req: AuthenticatedRequest, res: Response) {
+    try {
+      const data = await clinicalService.getUserArchetypes();
+      return res.json({ success: true, count: data.length, data });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  public async getUserArchetypeById(req: AuthenticatedRequest, res: Response) {
+    try {
+      const data = await clinicalService.getUserArchetypeById(req.params.id);
+      if (!data) return res.status(404).json({ success: false, error: 'Archetype not found' });
+      return res.json({ success: true, data });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  public async createUserArchetype(req: AuthenticatedRequest, res: Response) {
+    try {
+      const data = await clinicalService.createUserArchetype(req.body);
+      return res.status(201).json({ success: true, data });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  public async updateUserArchetype(req: AuthenticatedRequest, res: Response) {
+    try {
+      const data = await clinicalService.updateUserArchetype(req.params.id, req.body);
+      if (!data) return res.status(404).json({ success: false, error: 'Archetype not found' });
+      return res.json({ success: true, data });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+
+  public async deleteUserArchetype(req: AuthenticatedRequest, res: Response) {
+    try {
+      const success = await clinicalService.deleteUserArchetype(req.params.id);
+      if (!success) return res.status(404).json({ success: false, error: 'Archetype not found' });
+      return res.json({ success: true, message: 'Archetype deleted successfully' });
+    } catch (err: any) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+  }
+}
 
 export const clinicalController = new ClinicalController();

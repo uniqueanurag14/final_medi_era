@@ -30,6 +30,7 @@ import {
   FolderOpen,
   Plus,
   FileText,
+  Award,
 } from 'lucide-react';
 import { dbService } from '../../services/mockDatabase';
 
@@ -72,6 +73,19 @@ export const CrmSidebar: React.FC<CrmSidebarProps> = ({
   const pendingLeadsCount = dbService.leads.filter((l) => (l.stage || l.status) === 'New' || (l.stage || l.status) === 'Interested').length;
   const pendingFollowupsCount = dbService.followups.filter((f) => f.status === 'Pending').length;
 
+  // User Management Section (Specification 10)
+  const userManagementSection: NavSection = {
+    id: 'user-management-section',
+    title: 'USER MANAGEMENT',
+    icon: Users,
+    items: [
+      { id: 'admin-departments', label: 'Departments', icon: Building2 },
+      { id: 'admin-designations', label: 'Designations', icon: Award },
+      { id: 'admin-user-archetypes', label: 'User Archetypes', icon: ShieldCheck },
+      { id: 'admin-employees', label: 'User Directory & Staff Access', icon: Users },
+    ],
+  };
+
   // Organization & Multi-Branch Hierarchy Section
   const organizationHierarchySection: NavSection = {
     id: 'org-hierarchy-section',
@@ -80,7 +94,6 @@ export const CrmSidebar: React.FC<CrmSidebarProps> = ({
     items: [
       { id: 'admin-organizations', label: 'Organizations', icon: Building2 },
       { id: 'admin-branches', label: 'Branches & Sites', icon: Layers },
-      { id: 'admin-employees', label: 'Users & Personnel', icon: Users },
       { id: 'admin-roles', label: 'Roles & Permissions', icon: ShieldCheck },
     ],
   };
@@ -150,6 +163,7 @@ export const CrmSidebar: React.FC<CrmSidebarProps> = ({
 
   // Full unified sections list for Super Admin & Clinic Admin
   const fullUnifiedSections: NavSection[] = [
+    userManagementSection,
     organizationHierarchySection,
     ...frontOfficeSections,
     ...backOfficeSections,

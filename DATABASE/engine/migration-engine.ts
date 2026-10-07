@@ -189,6 +189,10 @@ export function translateSqlForMysql(sql: string): string {
   // 5. Replace TEXT UNIQUE with VARCHAR(255) UNIQUE
   s = s.replace(/\bTEXT(\s+NOT\s+NULL)?\s+UNIQUE\b/gi, 'VARCHAR(255)$1 UNIQUE');
 
+  // 5b. Replace TEXT DEFAULT with VARCHAR(255) DEFAULT (MySQL disallows default values on TEXT columns)
+  s = s.replace(/\bTEXT(\s+NOT\s+NULL)?\s+DEFAULT\b/gi, 'VARCHAR(255)$1 DEFAULT');
+  s = s.replace(/\bTEXT\s+DEFAULT\b/gi, 'VARCHAR(255) DEFAULT');
+
   // 6. MySQL syntax for CREATE INDEX IF NOT EXISTS -> CREATE INDEX
   s = s.replace(/\bCREATE\s+(UNIQUE\s+)?INDEX\s+IF\s+NOT\s+EXISTS\b/gi, 'CREATE $1INDEX');
 

@@ -11,6 +11,7 @@ interface AuthContextType {
   isSuperAdmin: boolean;
   isAuthenticated: boolean;
   refreshUser: () => Promise<void>;
+  updateUserProfile: (updates: Partial<User>) => void;
   changePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; message?: string }>;
   setRole: (role: UserRole) => void;
   setRoleAndUser: (role: UserRole, user?: Partial<User>) => void;
@@ -627,6 +628,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateUserProfile = (updates: Partial<User>) => {
+    setCurrentUser((prev) => {
+      const updated = { ...prev, ...updates };
+      try {
+        localStorage.setItem('mediera_session_user', JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -638,6 +649,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isSuperAdmin,
         isAuthenticated,
         refreshUser,
+        updateUserProfile,
         changePassword,
         setRole,
         setRoleAndUser,

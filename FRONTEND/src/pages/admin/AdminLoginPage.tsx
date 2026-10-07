@@ -7,14 +7,14 @@ import {
   Mail,
   ArrowRight,
   ShieldCheck,
-  Stethoscope,
+  ShieldAlert,
   AlertCircle,
-  KeyRound,
   CheckCircle2,
   Building2,
-  ShieldAlert,
   ArrowLeft,
-  Info
+  Shield,
+  KeyRound,
+  User,
 } from 'lucide-react';
 
 interface AdminLoginPageProps {
@@ -33,7 +33,6 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showCredentialsHelp, setShowCredentialsHelp] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,10 +55,10 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({
         return;
       }
 
-      // Security check: Patients and public customers MUST NOT access CRM/ERP
+      // Security check: Patient accounts are strictly prohibited
       if (res.user.role === 'PATIENT' || res.user.role === 'CUSTOMER') {
         setErrorMessage(
-          'Access Denied: Patient accounts are strictly prohibited from accessing the CRM/ERP Backoffice portal. Please sign in via the Patient Portal at /login.'
+          'Access Denied: Patient accounts are strictly prohibited from accessing CRM/ERP Backoffice. Please sign in via the Patient Portal at /login.'
         );
         return;
       }
@@ -71,23 +70,7 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({
           onSuccessRedirect(res.user!.role as UserRole);
           return;
         }
-
-        // Role-based landing dashboard
-        if (res.user?.role === 'DOCTOR') {
-          onNavigate('/erp/doctor-queue');
-        } else if (res.user?.role === 'RECEPTIONIST') {
-          onNavigate('/erp/appointments');
-        } else if (res.user?.role === 'NURSE') {
-          onNavigate('/erp/doctor-queue');
-        } else if (res.user?.role === 'LAB_TECHNICIAN') {
-          onNavigate('/erp/labs');
-        } else if (res.user?.role === 'PHARMACIST') {
-          onNavigate('/erp/inventory');
-        } else if (res.user?.role === 'ACCOUNTANT') {
-          onNavigate('/erp/billing');
-        } else {
-          onNavigate('/erp/dashboard');
-        }
+        onNavigate('/admin/dashboard');
       }, 500);
     } catch (err: any) {
       setIsSubmitting(false);
@@ -96,175 +79,171 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col justify-between selection:bg-teal-500 selection:text-white">
-      {/* Top Bar with Return to Public Site */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => onNavigate('/')}
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Return to Public Website</span>
-        </button>
-
-        <div className="flex items-center gap-2 text-xs text-slate-400">
-          <ShieldCheck className="w-4 h-4 text-teal-400" />
-          <span>Restricted Backoffice Environment</span>
-        </div>
-      </div>
-
-      {/* Center Auth Card */}
-      <div className="w-full max-w-md mx-auto px-4 py-8 sm:py-12">
-        <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-teal-600 flex items-center justify-center text-white mx-auto shadow-xl shadow-teal-500/20 mb-3.5">
-            <HeartPulse className="w-8 h-8" />
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Medi<span className="text-teal-400">Era</span> Backoffice
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-1.5">
-            Administrative & Clinical Personnel Portal (/admin)
-          </p>
-        </div>
-
-        {/* Security Alert / Notice */}
-        <div className="mb-6 p-3.5 bg-slate-800/80 border border-slate-700/80 rounded-2xl text-xs text-slate-300 flex items-start gap-3 shadow-inner">
-          <ShieldAlert className="w-4 h-4 text-teal-400 shrink-0 mt-0.5" />
-          <div className="leading-relaxed">
-            <strong className="text-white block mb-0.5">Authorized Personnel Only</strong>
-            Access to this portal is restricted to the Super Administrator, Physicians, and registered healthcare staff. Public self-registration is disabled.
-          </div>
-        </div>
-
-        {/* Login Card */}
-        <div className="bg-slate-800 border border-slate-700 rounded-3xl p-6 sm:p-8 shadow-2xl">
-          <h2 className="text-lg font-bold text-white mb-1">
-            Backoffice Sign In
-          </h2>
-          <p className="text-xs text-slate-400 mb-6">
-            Enter your provisioned login credentials to access your clinical or administrative workspace.
-          </p>
-
-          {/* Feedback banners */}
-          {errorMessage && (
-            <div className="mb-5 p-3.5 rounded-xl bg-rose-950/60 border border-rose-800/80 text-xs text-rose-200 flex items-start gap-2.5">
-              <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
-              <div className="leading-relaxed">{errorMessage}</div>
-            </div>
-          )}
-
-          {successMessage && (
-            <div className="mb-5 p-3.5 rounded-xl bg-teal-950/60 border border-teal-700/80 text-xs text-teal-200 flex items-start gap-2.5">
-              <CheckCircle2 className="w-4 h-4 text-teal-400 shrink-0 mt-0.5" />
-              <div className="leading-relaxed">{successMessage}</div>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Work Email or System Username
-              </label>
-              <div className="relative flex items-center">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
-                <input
-                  type="text"
-                  required
-                  autoFocus
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value)}
-                  placeholder="admin@mediera.com or doctor.smith"
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
-                />
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-semibold text-slate-300">
-                  Password
-                </label>
-              </div>
-              <div className="relative flex items-center">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500 transition-all"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between pt-1">
-              <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-400 hover:text-slate-300">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-3.5 h-3.5 rounded bg-slate-900 border-slate-700 text-teal-600 focus:ring-teal-500"
-                />
-                <span>Remember session</span>
-              </label>
-
-              <button
-                type="button"
-                onClick={() => setShowCredentialsHelp(!showCredentialsHelp)}
-                className="text-[11px] text-teal-400 hover:text-teal-300 font-medium inline-flex items-center gap-1 cursor-pointer"
-              >
-                <Info className="w-3 h-3" />
-                <span>Default setup info</span>
-              </button>
-            </div>
-
-            {showCredentialsHelp && (
-              <div className="p-3 bg-slate-900/90 border border-slate-700 rounded-xl text-[11px] text-slate-400 space-y-1.5 animate-in fade-in">
-                <p className="font-semibold text-slate-200">System Credentials Reference:</p>
-                <p>• <strong>Super Admin:</strong> Configured via <code className="text-teal-300">.env</code> (<code className="text-teal-300">dev.sinha14@gmail.com</code> / <code className="text-teal-300">Admin@123!</code>)</p>
-                <p>• <strong>Physicians & Staff:</strong> Use the login credentials created for you by the Super Administrator.</p>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full mt-2 py-3 px-4 bg-teal-600 hover:bg-teal-500 disabled:bg-teal-800 disabled:cursor-not-allowed text-white font-bold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-teal-600/20 active:scale-[0.99] transition-all cursor-pointer"
-            >
-              {isSubmitting ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Verifying Credentials...</span>
-                </>
-              ) : (
-                <>
-                  <span>Sign In to Backoffice</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
-          </form>
-        </div>
-
-        {/* Public Portal Redirection */}
-        <div className="text-center mt-6 text-xs text-slate-400">
-          <span>Looking for the Patient Health Portal? </span>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
+      {/* Top Navigation Bar */}
+      <div className="w-full bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <button
             type="button"
-            onClick={() => onNavigate('/login')}
-            className="text-teal-400 hover:text-teal-300 font-semibold underline underline-offset-2 cursor-pointer"
+            onClick={() => onNavigate('/')}
+            className="flex items-center gap-3 cursor-pointer select-none"
           >
-            Patient Sign In
+            <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-md shadow-teal-600/20">
+              <HeartPulse className="w-5 h-5" />
+            </div>
+            <div className="text-left">
+              <div className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white leading-none">
+                Medi<span className="text-teal-600 dark:text-teal-400">Era</span>
+              </div>
+              <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                Backoffice &amp; ERP Portal
+              </div>
+            </div>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => onNavigate('/')}
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Return to Public Website</span>
           </button>
         </div>
       </div>
 
-      {/* Footer */}
-      <div className="w-full text-center py-4 text-[11px] text-slate-500 border-t border-slate-800/80">
-        MediEra Healthcare Systems &copy; {new Date().getFullYear()} &bull; Backoffice Security Level 4 &bull; Role-Based Access Control
-      </div>
+      {/* Main Body */}
+      <main className="flex-1 flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+        <div className="w-full max-w-lg space-y-6">
+          {/* Header Title */}
+          <div className="text-center space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 text-xs font-bold uppercase tracking-wider">
+              <Shield className="w-3.5 h-3.5" />
+              <span>Administrative &amp; Staff Gateway</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+              CRM/ERP Backoffice Sign In
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+              Secure operational entry point for Executive Super Admins, Physicians, Clinical Specialists, and Healthcare Staff.
+            </p>
+          </div>
+
+          {/* Form Container (matches PublicLoginPage container style) */}
+          <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-sm transition-colors duration-200">
+            {/* Feedback Alerts */}
+            {errorMessage && (
+              <div className="mb-5 p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-xs text-rose-800 dark:text-rose-300 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+                <div className="leading-relaxed">{errorMessage}</div>
+              </div>
+            )}
+
+            {successMessage && (
+              <div className="mb-5 p-4 rounded-2xl bg-teal-50 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-900/60 text-xs text-teal-800 dark:text-teal-300 flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
+                <div className="leading-relaxed">{successMessage}</div>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Work Email or System Username
+                </label>
+                <div className="relative flex items-center">
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
+                  <input
+                    type="text"
+                    required
+                    autoFocus
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    placeholder="e.g. dev.sinha14@gmail.com or admin@mediera.com"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white dark:focus:bg-slate-800 focus:outline-teal-600 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                    Password
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => onNavigate('/forgot-password?role=admin')}
+                    className="text-xs text-teal-600 dark:text-teal-400 font-semibold hover:underline cursor-pointer"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+                <div className="relative flex items-center">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 pointer-events-none" />
+                  <input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:bg-white dark:focus:bg-slate-800 focus:outline-teal-600 transition-all"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs pt-1">
+                <label className="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-400 font-medium">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="w-4 h-4 rounded text-teal-600 border-slate-300 focus:ring-teal-500"
+                  />
+                  <span>Remember administrative session</span>
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full mt-2 py-3 px-4 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-teal-600/20 active:scale-[0.99] transition-all cursor-pointer disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Authenticating Staff Credentials...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Sign In to CRM/ERP Workspace</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Cross-portal guidance */}
+            <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800 text-center space-y-2">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Are you a Patient or Customer?
+              </p>
+              <button
+                type="button"
+                onClick={() => onNavigate('/login')}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-teal-600 dark:text-teal-400 hover:underline cursor-pointer"
+              >
+                <User className="w-3.5 h-3.5" />
+                <span>Go to Patient &amp; Customer Portal Login</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      {/* Footer copyright */}
+      <footer className="py-4 border-t border-slate-200/80 dark:border-slate-800 text-center text-xs text-slate-500">
+        &copy; {new Date().getFullYear()} MediEra Medical CRM + ERP System. All rights reserved.
+      </footer>
     </div>
   );
 };

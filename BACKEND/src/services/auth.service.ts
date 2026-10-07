@@ -153,7 +153,75 @@ export class AuthService {
     const token = signToken(authUser, 24);
     return { success: true, token, user: authUser };
   }
-}
 
+  /**
+   * Request password reset (role-aware: customer vs admin)
+   */
+  public async forgotPassword(email: string, roleContext?: string): Promise<{ success: boolean; message: string; simulatedCode?: string; resetUrl?: string }> {
+    const cleanEmail = email.trim().toLowerCase();
+    const { token, code, user } = await userRepository.createPasswordReset(cleanEmail, roleContext);
+
+    // Build reset URL
+    const roleParam = roleContext === 'customer' || roleContext === 'patient' ? 'customer' : 'admin';
+    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${token}&role=${roleParam}`;
+
+    // Always return safe message so as not to leak account existence
+    const safeMsg = 'If your email is registered in MediEra, password recovery instructions and your verification code have been generated.';
+
+    if (user) {
+      console.log(`[MediEra Password Recovery] User: ${user.email} | Code: ${code} | Link: ${resetUrl}`);
+    }
+
+    return {
+      success: true,
+      message: safeMsg,
+      simulatedCode: code,
+      resetUrl,
+    };
+  }
+
+  public async verifyResetCode(tokenOrCode: string, email?: string): Promise<{ success: boolean; valid: boolean; roleContext?: string; message?: string }> {
+    const { valid, user } = await userRepository.verifyPasswordReset(tokenOrCode, email);
+    if (!valid || !user) {
+      return { success: false, valid: false, message: 'Invalid or expired reset token or verification code.' };
+    }
+    const isPatient = user.userType === 'Patient' || user.roleName === 'PATIENT' || user.roleName === 'CUSTOMER';
+    return {
+      success: true,
+      valid: true,
+      roleContext: isPatient ? 'customer' : 'admin',
+    };
+  }
+
+  public async resetPassword(tokenOrCode: string, newPassword: string, email?: string): Promise<{ success: boolean; message: string }> {
+    if (!newPassword || newPassword.length < 8) {
+      return { success: false, message: 'Password must be at least 8 characters long.' };
+    }
+    const success = await userRepository.resetPasswordWithTokenOrCode(tokenOrCode, newPassword, email);
+    if (!success) {
+      return { success: false, message: 'Failed to reset password. The recovery link or code may have expired.' };
+    }
+    return { success: true, message: 'Password has been reset successfully. You can now sign in.' };
+  }
+
+  public async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+    if (!newPassword || newPassword.length < 8) {
+      return { success: false, message: 'New password must be at least 8 characters long.' };
+    }
+    const res = await userRepository.updateUserPassword(userId, currentPassword, newPassword);
+    if (!res.success) {
+      return { success: false, message: res.error || 'Failed to update password.' };
+    }
+    return { success: true, message: 'Password updated successfully.' };
+  }
+
+  public async updateProfile(userId: string, updates: { name?: string; phone?: string; avatarUrl?: string }): Promise<{ success: boolean; user?: any; error?: string }> {
+    const updated = await userRepository.updateUserProfile(userId, updates);
+    if (!updated) {
+      return { success: false, error: 'User not found or update failed.' };
+    }
+    return { success: true, user: updated };
+  }
+}
 
 export const authService = new AuthService();

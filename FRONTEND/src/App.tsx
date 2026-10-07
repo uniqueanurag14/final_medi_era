@@ -58,6 +58,9 @@ import { AdminMigrationsPage } from './pages/admin/AdminMigrationsPage';
 import { AdminOrganizationsPage } from './pages/admin/AdminOrganizationsPage';
 import { AdminBranchesPage } from './pages/admin/AdminBranchesPage';
 import { AdminEmployeesPage } from './pages/admin/AdminEmployeesPage';
+import { AdminDepartmentsPage } from './pages/admin/AdminDepartmentsPage';
+import { AdminDesignationsPage } from './pages/admin/AdminDesignationsPage';
+import { AdminUserArchetypesPage } from './pages/admin/AdminUserArchetypesPage';
 import { AdminRolesPage } from './pages/admin/AdminRolesPage';
 import { AdminServicesPage } from './pages/admin/AdminServicesPage';
 
@@ -248,6 +251,9 @@ function ClinicAppContent() {
     '/erp/migrations',
   ].includes(canonicalView) || [
     'admin-employees',
+    'admin-departments',
+    'admin-designations',
+    'admin-user-archetypes',
     'admin-organizations',
     'admin-branches',
     'admin-roles',
