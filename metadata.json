@@ -1,0 +1,8 @@
+{
+  "name": "MediEra | Digital Healthcare, Clinic Management & Hospital ERP",
+  "description": "MediEra comprehensive enterprise clinic and hospital management system: multi-branch, role-based dashboards (Admin, Doctor, Receptionist, Nurse, Lab, Pharmacy, Accountant), real-time queue, consultations, prescriptions, billing, medical records, CRM & analytics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

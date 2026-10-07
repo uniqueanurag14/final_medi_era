@@ -1,0 +1,50 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": [
+        "./FRONTEND/src/*"
+      ],
+      "@frontend/*": [
+        "./FRONTEND/src/*"
+      ],
+      "@backend/*": [
+        "./BACKEND/src/*"
+      ],
+      "@database/*": [
+        "./DATABASE/*"
+      ],
+      "@config/*": [
+        "./CONFIG/*"
+      ]
+    },
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+  "include": [
+    "FRONTEND/src/**/*",
+    "BACKEND/src/**/*",
+    "DATABASE/**/*",
+    "CONFIG/**/*",
+    "SCRIPTS/**/*",
+    "server.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

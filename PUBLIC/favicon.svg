@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none" width="100%" height="100%">
+  <defs>
+    <!-- Medical Cross Gradient -->
+    <linearGradient id="favCrossGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#56CCF2" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+
+    <!-- Main Ring Gradient -->
+    <linearGradient id="favRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="60%" stop-color="#0284C7" />
+      <stop offset="100%" stop-color="#0369A1" />
+    </linearGradient>
+
+    <!-- Dynamic Ascending Swoosh Gradient -->
+    <linearGradient id="favSwooshGrad" x1="10%" y1="90%" x2="90%" y2="10%">
+      <stop offset="0%" stop-color="#083358" />
+      <stop offset="35%" stop-color="#0284C7" />
+      <stop offset="70%" stop-color="#0EA5E9" />
+      <stop offset="100%" stop-color="#56CCF2" />
+    </linearGradient>
+
+    <!-- Arrowhead Gradient -->
+    <linearGradient id="favArrowGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284C7" />
+      <stop offset="100%" stop-color="#38BDF8" />
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(10, 10)">
+    <!-- 1. Main Circular Ring -->
+    <circle
+      cx="48"
+      cy="50"
+      r="32"
+      stroke="url(#favRingGrad)"
+      stroke-width="6"
+      fill="none"
+      stroke-linecap="round"
+    />
+
+    <!-- 2. Medical Plus Cross in Center -->
+    <g transform="translate(48, 50)">
+      <rect x="-16" y="-6.5" width="32" height="13" rx="4" fill="url(#favCrossGrad)" />
+      <rect x="-6.5" y="-16" width="13" height="32" rx="4" fill="url(#favCrossGrad)" />
+      <rect x="-5" y="-5" width="10" height="10" rx="2" fill="#BAE6FD" opacity="0.35" />
+    </g>
+
+    <!-- 3. 3D Hydrodynamic Swoosh -->
+    <path
+      d="M 10 58 C 8 76 24 92 50 93 C 76 94 92 80 98 60 C 100 54 100 48 99 41 C 97 49 90 63 76 72 C 64 80 44 80 29 73 C 20 69 14 64 10 58 Z"
+      fill="url(#favSwooshGrad)"
+    />
+
+    <!-- 4. Sleek Arrowhead Pointing Up-Right (↗ 45°) -->
+    <g transform="translate(97, 23)">
+      <path d="M -8 20 C -5 12 -1 6 3 0 L -7 1 Z" fill="url(#favSwooshGrad)" opacity="0.85" />
+      <path
+        d="M 4 -4 L 15 18 L 1 13 L -5 24 Z"
+        fill="url(#favArrowGrad)"
+        stroke="#38BDF8"
+        stroke-width="0.5"
+      />
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 120" fill="none" width="100%" height="100%">
+  <defs>
+    <!-- Cross gradient (Soft Medical Cyan to Sky Blue) -->
+    <linearGradient id="crossGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#56CCF2"/>
+      <stop offset="100%" stop-color="#2D9CDB"/>
+    </linearGradient>
+
+    <!-- Ring Circle Gradient -->
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38B6FF"/>
+      <stop offset="60%" stop-color="#0284C7"/>
+      <stop offset="100%" stop-color="#0369A1"/>
+    </linearGradient>
+
+    <!-- Dynamic Swoosh Gradient -->
+    <linearGradient id="swooshGrad" x1="0%" y1="80%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0A4D8C"/>
+      <stop offset="35%" stop-color="#0284C7"/>
+      <stop offset="75%" stop-color="#0EA5E9"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+
+    <!-- Arrowhead highlight -->
+    <linearGradient id="arrowGrad" x1="0%" y1="100%" x2="50%" y2="0%">
+      <stop offset="0%" stop-color="#0284C7"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+
+    <!-- Drop Shadow for 3D depth -->
+    <filter id="subtleSwooshShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#00284E" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+
+  <!-- EMBLEM GROUP (Transparent Background) -->
+  <g transform="translate(10, 4)">
+    <!-- 1. MAIN CIRCULAR RING -->
+    <ellipse cx="62" cy="58" rx="34" ry="34" 
+             stroke="url(#ringGrad)" stroke-width="6.5" fill="none"
+             stroke-linecap="round"/>
+
+    <!-- 2. MEDICAL PLUS CROSS (Clean Rounded Geometry) -->
+    <g transform="translate(62, 58)">
+      <!-- Horizontal cross bar -->
+      <rect x="-17" y="-6.5" width="34" height="13" rx="4" fill="url(#crossGrad)"/>
+      <!-- Vertical cross bar -->
+      <rect x="-6.5" y="-17" width="13" height="34" rx="4" fill="url(#crossGrad)"/>
+      <!-- Subtle center soft highlight -->
+      <rect x="-6.5" y="-6.5" width="13" height="13" rx="2.5" fill="#56CCF2" opacity="0.3"/>
+    </g>
+
+    <!-- 3. 3D DYNAMIC SWOOSH WITH UPWARD-RIGHT ARROW -->
+    <!-- Swoosh body wrapping underneath and curving upward -->
+    <path d="M 18 68 C 14 86 34 100 62 101 C 88 102 106 86 112 65 C 114 58 114 50 113 42 C 110 52 103 68 88 77 C 74 85 52 86 36 78 C 28 74 22 70 18 68 Z" 
+          fill="url(#swooshGrad)" 
+          filter="url(#subtleSwooshShadow)"/>
+
+    <!-- Outer dynamic crest swoosh -->
+    <path d="M 16 66 C 14 78 22 92 42 100 C 60 107 84 104 102 91 C 112 83 118 70 118 56 C 118 65 112 76 102 84 C 84 97 60 99 42 93 C 26 86 18 75 16 66 Z" 
+          fill="#063E73" opacity="0.45"/>
+
+    <!-- Dynamic ascending arrow pointing upper-right (45 deg) -->
+    <g transform="translate(108, 26)">
+      <!-- Arrow shaft continuation -->
+      <path d="M -8 18 C -5 12 -2 6 2 0 L -8 0 Z" fill="url(#swooshGrad)" opacity="0.8"/>
+      <!-- Arrowhead -->
+      <path d="M 3 -3 L 13 18 L 0 14 L -6 24 Z" fill="url(#arrowGrad)"/>
+    </g>
+  </g>
+
+  <!-- TYPOGRAPHY (Transparent Background) -->
+  <g transform="translate(142, 34)">
+    <!-- Brand Name: MEDI ERA -->
+    <text x="0" y="30" 
+          font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" 
+          font-weight="800" 
+          font-size="36" 
+          letter-spacing="0.04em" 
+          fill="#10385C">MEDI ERA</text>
+
+    <!-- Subtitle: Medical Services & Clinic Management -->
+    <text x="2" y="58" 
+          font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" 
+          font-weight="600" 
+          font-size="16.5" 
+          letter-spacing="0.01em" 
+          fill="#15476E">Medical Services &amp; Clinic Management</text>
+  </g>
+</svg>

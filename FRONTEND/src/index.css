@@ -1,0 +1,877 @@
+/* =========================================================
+MEDIERA — TYPOGRAPHY & THEME SYSTEM
+Clean / Professional / Medical UI
+========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* =========================================================
+TAILWIND V4 THEME MAPPINGS
+Remaps all color utilities across the entire application
+to the requested Medical Blue & Deep Navy palette.
+========================================================= */
+@theme {
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-heading: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  /* Remap primary & teal color tokens to the requested Professional Medical Blue palette */
+  --color-teal-50: #f0f9ff;
+  --color-teal-100: #e0f2fe;
+  --color-teal-200: #bae6fd;
+  --color-teal-300: #7dd3fc;
+  --color-teal-400: #38bdf8;
+  --color-teal-500: #0ea5e9;
+  --color-teal-600: #0284c7; /* Professional Medical Blue */
+  --color-teal-700: #0369a1;
+  --color-teal-800: #075985;
+  --color-teal-900: #0c4a6e;
+  --color-teal-950: #082f49;
+
+  /* Primary tokens */
+  --color-primary-50: #f0f9ff;
+  --color-primary-100: #e0f2fe;
+  --color-primary-200: #bae6fd;
+  --color-primary-300: #7dd3fc;
+  --color-primary-400: #38bdf8;
+  --color-primary-500: #0ea5e9;
+  --color-primary-600: #0284c7;
+  --color-primary-700: #0369a1;
+  --color-primary-800: #075985;
+  --color-primary-900: #0c4a6e;
+  --color-primary-950: #082f49;
+
+  /* Deep Navy healthcare interface tokens for dark mode */
+  --color-slate-950: #070d18; /* Deep navy / almost black background */
+  --color-slate-900: #0f172a; /* Dark navy surface */
+  --color-slate-850: #131f37;
+  --color-slate-800: #1e293b; /* Subtle dark blue borders */
+  --color-slate-700: #334155;
+  --color-slate-600: #64748b;
+  --color-slate-500: #94a3b8;
+  --color-slate-400: #94a3b8; /* Cool gray */
+  --color-slate-300: #cbd5e1;
+  --color-slate-200: #e2e8f0; /* Subtle light gray borders */
+  --color-slate-100: #f1f5f9;
+  --color-slate-50: #f8fafc;  /* Soft white / very light gray background */
+}
+
+/* =========================================================
+ROOT VARIABLES & THEME TOKENS
+========================================================= */
+
+:root {
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-heading: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  /* =========================================================
+     LIGHT THEME (Clean healthcare interface)
+     - Background: soft white / very light gray (#f8fafc)
+     - Surface: white (#ffffff)
+     - Main text: dark charcoal / near-black (#0f172a)
+     - Secondary text: medium gray (#64748b)
+     - Borders: subtle light gray (#e2e8f0)
+     - Primary: professional medical blue (#0284c7)
+     - Contrast guarantee: Light background → Dark text
+  ========================================================= */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  --foreground-secondary: #334155;
+  --muted-foreground: #64748b;
+  --subtle-foreground: #94a3b8;
+
+  --surface: #ffffff;
+  --surface-secondary: #f1f5f9;
+  --surface-tertiary: #e2e8f0;
+
+  --border: #e2e8f0;
+  --border-subtle: #f1f5f9;
+  --border-focus: #0284c7;
+
+  /* Medical Blue Primary */
+  --primary-50: #f0f9ff;
+  --primary-100: #e0f2fe;
+  --primary-200: #bae6fd;
+  --primary-300: #7dd3fc;
+  --primary-400: #38bdf8;
+  --primary-500: #0ea5e9;
+  --primary-600: #0284c7;
+  --primary-700: #0369a1;
+  --primary-800: #075985;
+  --primary-900: #0c4a6e;
+  --primary: #0284c7;
+  --primary-foreground: #ffffff;
+
+  /* Subtle Healthcare Gradients & Shadows */
+  --gradient-page: linear-gradient(180deg, #f8fafc 0%, #f0f7ff 100%);
+  --gradient-card: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  --gradient-subtle-blue: linear-gradient(135deg, rgba(2, 132, 199, 0.05) 0%, rgba(14, 165, 233, 0.02) 100%);
+  --gradient-glow: radial-gradient(circle at 50% 0%, rgba(2, 132, 199, 0.08) 0%, transparent 70%);
+
+  --shadow-subtle: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.02);
+  --shadow-card: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 2px 4px -2px rgba(15, 23, 42, 0.03);
+  --shadow-glow: 0 0 20px rgba(2, 132, 199, 0.12);
+}
+
+/* =========================================================
+   DARK THEME (Premium deep dark healthcare interface)
+   - Background: deep navy / almost black (#070d18)
+   - Surface: dark navy (#0f172a)
+   - Main text: white / near-white (#f8fafc)
+   - Secondary text: cool gray (#cbd5e1)
+   - Borders: subtle dark blue (#1e293b)
+   - Primary: bright medical blue (#38bdf8)
+   - Contrast guarantee: Dark background → White/light text
+========================================================= */
+.dark,
+html.dark,
+:root[data-theme="dark"] {
+  --background: #070d18;
+  --foreground: #f8fafc;
+  --foreground-secondary: #cbd5e1;
+  --muted-foreground: #94a3b8;
+  --subtle-foreground: #64748b;
+
+  --surface: #0f172a;
+  --surface-secondary: #17233c;
+  --surface-tertiary: #1e2e4f;
+
+  --border: #1e293b;
+  --border-subtle: #17233c;
+  --border-focus: #38bdf8;
+
+  /* Bright Medical Blue Primary for Dark Mode */
+  --primary-50: #082f49;
+  --primary-100: #0c4a6e;
+  --primary-200: #0369a1;
+  --primary-300: #0284c7;
+  --primary-400: #0ea5e9;
+  --primary-500: #38bdf8;
+  --primary-600: #7dd3fc;
+  --primary-700: #bae6fd;
+  --primary-800: #e0f2fe;
+  --primary-900: #f0f9ff;
+  --primary: #38bdf8;
+  --primary-foreground: #082f49;
+
+  /* Deep Navy Gradients & Soft Blue Glow Effects */
+  --gradient-page: linear-gradient(180deg, #070d18 0%, #0b1528 100%);
+  --gradient-card: linear-gradient(180deg, #0f172a 0%, #0c1527 100%);
+  --gradient-subtle-blue: linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(2, 132, 199, 0.03) 100%);
+  --gradient-glow: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 70%);
+
+  --shadow-subtle: 0 1px 3px 0 rgba(0, 0, 0, 0.35);
+  --shadow-card: 0 4px 14px 0 rgba(0, 0, 0, 0.45);
+  --shadow-glow: 0 0 25px rgba(56, 189, 248, 0.22);
+}
+
+/* =========================================================
+GLOBAL RESET & BASE
+========================================================= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--foreground);
+  background: var(--gradient-page);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+/* Smooth theme transition */
+html.theme-transition body,
+html.theme-transition header,
+html.theme-transition aside,
+html.theme-transition main,
+html.theme-transition nav,
+html.theme-transition .theme-surface {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* =========================================================
+REMOVE DEFAULT MARGINS
+========================================================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+figure,
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+}
+
+/* =========================================================
+HEADINGS (Hierarchy: Size, Weight, Tight Line-Height)
+H1: Extra Bold / 800 — strong, prominent, modern
+H2: Bold / 700–800 — strong section headings
+H3: Semi Bold / 600 — subsection / card titles
+H4: Medium / 500–600 — smaller section titles
+========================================================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-family: var(--font-heading);
+  color: var(--foreground);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+/* H1: Extra Bold / 800 — strong, prominent, modern */
+h1 {
+  font-size: clamp(2.75rem, 5vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+/* H2: Bold / 700–800 — strong section headings */
+h2 {
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+/* H3: Semi Bold / 600 — subsection / card titles */
+h3 {
+  font-size: 1.375rem;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+/* H4: Medium / 500–600 — smaller section titles */
+h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+
+/* H5 */
+h5 {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+/* H6 */
+h6 {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+
+/* =========================================================
+BODY TEXT & PARAGRAPHS
+Body text: Regular / 400 — clean, readable, comfortable
+Small text: Regular / 400 — metadata, captions, timestamps
+========================================================= */
+
+p {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.65;
+  color: var(--foreground-secondary);
+}
+
+/* SMALL TEXT */
+small {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+
+/* STRONG / BOLD */
+strong,
+b {
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+/* LINKS */
+a {
+  color: inherit;
+  text-decoration: none;
+  font-weight: inherit;
+}
+
+/* =========================================================
+BUTTONS & CONTROLS
+Buttons / navigation: Medium to Semi Bold / 500–600
+========================================================= */
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+button {
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* LABELS */
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--foreground);
+}
+
+/* LISTS */
+ul,
+ol {
+  padding-left: 1.5rem;
+}
+
+li {
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* BLOCKQUOTE */
+blockquote {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--foreground-secondary);
+}
+
+/* CODE */
+code,
+pre,
+kbd,
+samp {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+/* =========================================================
+DISPLAY & SECTION UTILITY CLASSES
+========================================================= */
+
+.display-title {
+  font-family: var(--font-heading);
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.05em;
+  color: var(--foreground);
+  text-wrap: balance;
+}
+
+.section-title {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  color: var(--foreground);
+  text-wrap: balance;
+}
+
+.section-description {
+  max-width: 42rem;
+  margin-top: 1rem;
+  font-size: 1.05rem;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--muted-foreground);
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: var(--foreground);
+}
+
+.card-description {
+  margin-top: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary-600);
+}
+
+.dark .eyebrow {
+  color: var(--primary-400);
+}
+
+.nav-link {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--muted-foreground);
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--primary-600);
+}
+
+.dark .nav-link:hover {
+  color: var(--primary-400);
+}
+
+.btn-primary,
+.btn-secondary {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+}
+
+/* FORM TYPOGRAPHY */
+input,
+textarea,
+select {
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+input::placeholder,
+textarea::placeholder {
+  font-weight: 400;
+  color: var(--subtle-foreground);
+}
+
+/* TABLE TYPOGRAPHY */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+th {
+  font-weight: 600;
+  text-align: left;
+  color: var(--foreground);
+}
+
+td {
+  font-weight: 400;
+  color: var(--foreground-secondary);
+}
+
+/* =========================================================
+CONTRAST CONTROLS:
+BACKGROUND DARK → TEXT WHITE
+BACKGROUND LIGHT → TEXT DARK
+========================================================= */
+
+/* 1. Explicit light background containers: Enforce crisp dark text */
+.bg-light-container,
+.surface-light,
+[data-theme-surface="light"] {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+.bg-light-container h1,
+.bg-light-container h2,
+.bg-light-container h3,
+.bg-light-container h4,
+.bg-light-container strong,
+.surface-light h1,
+.surface-light h2,
+.surface-light h3,
+.surface-light h4,
+.surface-light strong {
+  color: #0f172a;
+}
+.bg-light-container p,
+.surface-light p {
+  color: #334155;
+}
+.bg-light-container small,
+.surface-light small {
+  color: #64748b;
+}
+
+/* 2. Explicit dark background containers: Enforce crisp white/light text */
+.bg-dark-container,
+.surface-dark,
+[data-theme-surface="dark"],
+.bg-slate-900,
+.bg-slate-950,
+.bg-zinc-900,
+.bg-navy {
+  color: #f8fafc;
+}
+.bg-dark-container h1,
+.bg-dark-container h2,
+.bg-dark-container h3,
+.bg-dark-container h4,
+.bg-dark-container strong,
+.surface-dark h1,
+.surface-dark h2,
+.surface-dark h3,
+.surface-dark h4,
+.surface-dark strong,
+.bg-slate-900 h1,
+.bg-slate-900 h2,
+.bg-slate-900 h3,
+.bg-slate-900 h4,
+.bg-slate-900 strong,
+.bg-slate-950 h1,
+.bg-slate-950 h2,
+.bg-slate-950 h3,
+.bg-slate-950 h4,
+.bg-slate-950 strong {
+  color: #f8fafc;
+}
+.bg-dark-container p,
+.surface-dark p,
+.bg-slate-900 p,
+.bg-slate-950 p {
+  color: #cbd5e1;
+}
+.bg-dark-container small,
+.surface-dark small,
+.bg-slate-900 small,
+.bg-slate-950 small {
+  color: #94a3b8;
+}
+
+/* 3. Global Dark Mode Semantic Surfaces & Text Mappings */
+:where(html.dark) .bg-white:not([data-keep-white]):not(.no-dark-surface) {
+  background-color: #0f172a;
+}
+
+:where(html.dark) .bg-slate-50:not([data-keep-white]):not(.no-dark-surface) {
+  background-color: #070d18;
+}
+
+:where(html.dark) .bg-slate-100:not([data-keep-white]):not(.no-dark-surface) {
+  background-color: #17233c;
+}
+
+:where(html.dark) .bg-slate-200:not([data-keep-white]):not(.no-dark-surface) {
+  background-color: #1e2e4f;
+}
+
+/* Dark mode typography adaptation */
+:where(html.dark) .text-slate-900:not([data-keep-color]) {
+  color: #f8fafc;
+}
+
+:where(html.dark) .text-slate-800:not([data-keep-color]) {
+  color: #f1f5f9;
+}
+
+:where(html.dark) .text-slate-700:not([data-keep-color]) {
+  color: #e2e8f0;
+}
+
+:where(html.dark) .text-slate-600:not([data-keep-color]) {
+  color: #cbd5e1;
+}
+
+:where(html.dark) .text-slate-500:not([data-keep-color]) {
+  color: #94a3b8;
+}
+
+:where(html.dark) .text-slate-400:not([data-keep-color]) {
+  color: #94a3b8;
+}
+
+/* Dark mode borders and dividers */
+:where(html.dark) .border-slate-200:not([data-keep-border]),
+:where(html.dark) .border-slate-100:not([data-keep-border]),
+:where(html.dark) .border-slate-200\/90:not([data-keep-border]),
+:where(html.dark) .border-slate-200\/80:not([data-keep-border]) {
+  border-color: #1e293b;
+}
+
+:where(html.dark) .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+:where(html.dark) .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #1e293b;
+}
+
+/* Dark mode form controls */
+:where(html.dark) input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="range"]),
+:where(html.dark) select,
+:where(html.dark) textarea {
+  background-color: #17233c;
+  color: #f8fafc;
+  border-color: #1e2e4f;
+}
+
+:where(html.dark) input::placeholder,
+:where(html.dark) textarea::placeholder {
+  color: #64748b;
+}
+
+:where(html.dark) input:focus,
+:where(html.dark) select:focus,
+:where(html.dark) textarea:focus {
+  background-color: #0f172a;
+  border-color: var(--primary);
+}
+
+/* Dark mode table headings and hover rows */
+:where(html.dark) thead {
+  background-color: #17233c;
+}
+
+:where(html.dark) thead th {
+  color: #94a3b8;
+  border-color: #1e293b;
+}
+
+:where(html.dark) tr.hover\:bg-slate-50\/60:hover,
+:where(html.dark) tr.hover\:bg-slate-50:hover,
+:where(html.dark) .hover\:bg-slate-50:hover {
+  background-color: #17233c;
+}
+
+/* =========================================================
+MEDICAL UI VISUAL ENHANCEMENTS
+========================================================= */
+
+.medical-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+  border-radius: 1rem;
+  transition: all 0.2s ease;
+}
+
+.medical-card:hover {
+  border-color: var(--primary-300);
+  box-shadow: var(--shadow-glow);
+}
+
+.dark .medical-card:hover {
+  border-color: var(--primary-700);
+}
+
+.glow-blue {
+  box-shadow: var(--shadow-glow);
+}
+
+/* =========================================================
+MOBILE TYPOGRAPHY RESPONSIVENESS
+========================================================= */
+
+@media (max-width: 640px) {
+  h1 {
+    font-size: 2.5rem;
+    letter-spacing: -0.04em;
+  }
+
+  h2 {
+    font-size: 2rem;
+    letter-spacing: -0.03em;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+  }
+
+  p {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .display-title {
+    font-size: 2.75rem;
+    letter-spacing: -0.045em;
+  }
+}
+
+/* =========================================================
+ACCESSIBILITY & SCROLLBARS
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #1e293b;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Clean document printing standards */
+@media print {
+  html,
+  body,
+  html.dark,
+  html.dark body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+
+/* =========================================================
+   BACKOFFICE WORKSPACE TYPOGRAPHY (CLEAN & PROFESSIONAL)
+   Normal, clean, enterprise ERP/CRM sizing across all pages.
+   Prevents oversized marketing headings inside the backoffice.
+========================================================= */
+
+.backoffice-workspace {
+  font-size: 0.875rem; /* 14px clean professional base */
+  line-height: 1.5;
+}
+
+.backoffice-workspace h1,
+.backoffice-workspace .backoffice-title {
+  font-size: 1.25rem !important; /* 20px clean, professional header */
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.015em !important;
+}
+
+.backoffice-workspace h2,
+.backoffice-workspace .backoffice-section-title {
+  font-size: 1.0625rem !important; /* 17px */
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.backoffice-workspace h3,
+.backoffice-workspace .backoffice-card-title {
+  font-size: 0.9375rem !important; /* 15px */
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.01em !important;
+}
+
+.backoffice-workspace h4 {
+  font-size: 0.875rem !important; /* 14px */
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+}
+
+.backoffice-workspace p {
+  font-size: 0.8125rem; /* 13px clean readable body */
+  line-height: 1.45;
+}
+
+.backoffice-workspace .text-2xl {
+  font-size: 1.25rem !important; /* Cap text-2xl inside backoffice to 20px */
+  line-height: 1.3 !important;
+}
+
+.backoffice-workspace .text-3xl {
+  font-size: 1.375rem !important; /* Cap text-3xl to 22px */
+  line-height: 1.25 !important;
+}
+
+.backoffice-workspace .text-4xl {
+  font-size: 1.5rem !important; /* Cap text-4xl (KPI stat counters) to 24px */
+  line-height: 1.2 !important;
+}
+
+.backoffice-workspace table th {
+  font-size: 0.75rem; /* 12px uppercase table headers */
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+.backoffice-workspace table td {
+  font-size: 0.8125rem; /* 13px table cell data */
+  line-height: 1.4;
+}
+
+.backoffice-workspace input,
+.backoffice-workspace select,
+.backoffice-workspace textarea {
+  font-size: 0.8125rem; /* 13px inputs */
+}
+
+.backoffice-workspace button {
+  font-size: 0.8125rem; /* 13px buttons */
+}
+
