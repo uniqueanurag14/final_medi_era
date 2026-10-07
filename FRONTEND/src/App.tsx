@@ -79,17 +79,26 @@ function ClinicAppContent() {
 
   // Global Modal States
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [bookingPrefillDoctorId, setBookingPrefillDoctorId] = useState<string | undefined>();
-  const [bookingPrefillSpecialtyId, setBookingPrefillSpecialtyId] = useState<string | undefined>();
-  const [bookingPrefillService, setBookingPrefillService] = useState<string | undefined>();
+  const [bookingPrefillDoctorId, setBookingPrefillDoctorId] = useState<
+    string | undefined
+  >();
+  const [bookingPrefillSpecialtyId, setBookingPrefillSpecialtyId] = useState<
+    string | undefined
+  >();
+  const [bookingPrefillService, setBookingPrefillService] = useState<
+    string | undefined
+  >();
 
   const [isNewPatientModalOpen, setIsNewPatientModalOpen] = useState(false);
 
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [selectedPaymentInvoice, setSelectedPaymentInvoice] = useState<Invoice | null>(null);
+  const [selectedPaymentInvoice, setSelectedPaymentInvoice] =
+    useState<Invoice | null>(null);
 
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
-  const [printDocType, setPrintDocType] = useState<'prescription' | 'invoice' | 'lab_report' | 'token'>('prescription');
+  const [printDocType, setPrintDocType] = useState<
+    'prescription' | 'invoice' | 'lab_report' | 'token'
+  >('prescription');
   const [printDocData, setPrintDocData] = useState<any>(null);
 
   // Sync browser back/forward and initial URL state
@@ -105,7 +114,11 @@ function ClinicAppContent() {
     // Initial canonical sync
     const initialCanonical = normalizePath(window.location.pathname);
     if (window.location.pathname !== initialCanonical) {
-      window.history.replaceState({ path: initialCanonical }, '', initialCanonical);
+      window.history.replaceState(
+        { path: initialCanonical },
+        '',
+        initialCanonical,
+      );
     }
     updateSEO(initialCanonical);
 
@@ -128,9 +141,17 @@ function ClinicAppContent() {
   };
 
   // Helper to open booking modal with optional prefill - DEFENSIVE AGAINST NON-STRINGS
-  const handleOpenBookingModal = (doctorIdOrService?: unknown, specialtyId?: string, serviceName?: string) => {
+  const handleOpenBookingModal = (
+    doctorIdOrService?: unknown,
+    specialtyId?: string,
+    serviceName?: string,
+  ) => {
     if (typeof doctorIdOrService === 'string') {
-      if (!doctorIdOrService.startsWith('doc-') && !specialtyId && !serviceName) {
+      if (
+        !doctorIdOrService.startsWith('doc-') &&
+        !specialtyId &&
+        !serviceName
+      ) {
         setBookingPrefillDoctorId(undefined);
         setBookingPrefillSpecialtyId(undefined);
         setBookingPrefillService(doctorIdOrService);
@@ -154,7 +175,10 @@ function ClinicAppContent() {
   };
 
   // Helper to open print modal
-  const handleOpenPrintModal = (type: 'prescription' | 'invoice' | 'lab_report' | 'token', data: any) => {
+  const handleOpenPrintModal = (
+    type: 'prescription' | 'invoice' | 'lab_report' | 'token',
+    data: any,
+  ) => {
     setPrintDocType(type);
     setPrintDocData(data);
     setIsPrintModalOpen(true);
@@ -162,7 +186,10 @@ function ClinicAppContent() {
 
   // Canonical path evaluation
   const canonicalView = normalizePath(currentView);
-  const isDoctorDetail = canonicalView.startsWith('/doctors/') || (typeof currentView === 'string' && currentView.startsWith('doctor-detail-'));
+  const isDoctorDetail =
+    canonicalView.startsWith('/doctors/') ||
+    (typeof currentView === 'string' &&
+      currentView.startsWith('doctor-detail-'));
   const doctorDetailId = isDoctorDetail
     ? canonicalView.startsWith('/doctors/')
       ? canonicalView.replace('/doctors/', '')
@@ -170,18 +197,41 @@ function ClinicAppContent() {
     : '';
 
   // User Authentication & Role Resolution
-  const isAuthenticated = Boolean(currentUser && currentUser.active && currentUser.id !== 'usr-unauthenticated');
-  const isPatient = Boolean(isAuthenticated && (currentRole === 'PATIENT' || currentRole === 'CUSTOMER'));
-  const isSuperAdmin = Boolean(isAuthenticated && (currentRole === 'SUPER_ADMIN' || currentUser?.isSuperAdmin));
+  const isAuthenticated = Boolean(
+    currentUser &&
+    currentUser.active &&
+    currentUser.id !== 'usr-unauthenticated',
+  );
+  const isPatient = Boolean(
+    isAuthenticated &&
+    (currentRole === 'PATIENT' || currentRole === 'CUSTOMER'),
+  );
+  const isSuperAdmin = Boolean(
+    isAuthenticated &&
+    (currentRole === 'SUPER_ADMIN' || currentUser?.isSuperAdmin),
+  );
   const isErpStaff = Boolean(isAuthenticated && !isPatient);
 
   // 1. CRM/ERP Auth Routes & Attempted public registration
-  const isErpLoginView = canonicalView === '/erp/login' || canonicalView === '/admin/login' || currentView === 'erp-login';
-  const isErpRegisterAttempt = canonicalView === '/erp/registration' || canonicalView === '/erp/register' || currentView === 'erp-register';
+  const isErpLoginView =
+    canonicalView === '/erp/login' ||
+    canonicalView === '/admin/login' ||
+    currentView === 'erp-login';
+  const isErpRegisterAttempt =
+    canonicalView === '/erp/registration' ||
+    canonicalView === '/erp/register' ||
+    currentView === 'erp-register';
 
   // 2. Patient Auth Routes
-  const isPatientLoginView = canonicalView === '/login' || currentView === 'login' || currentView === 'public-login';
-  const isPatientRegisterView = canonicalView === '/registration' || canonicalView === '/register' || currentView === 'register' || currentView === 'public-register';
+  const isPatientLoginView =
+    canonicalView === '/login' ||
+    currentView === 'login' ||
+    currentView === 'public-login';
+  const isPatientRegisterView =
+    canonicalView === '/registration' ||
+    canonicalView === '/register' ||
+    currentView === 'register' ||
+    currentView === 'public-register';
 
   // 3. Patient Protected Routes (Personal data & pages strictly require authenticated PATIENT session)
   const isPatientProtectedRoute =
@@ -225,10 +275,23 @@ function ClinicAppContent() {
     publicRoutes.includes(canonicalView) ||
     isDoctorDetail ||
     [
-      'home', 'public-home', 'about', 'public-about', 'faq', 'public-faq',
-      'doctors', 'public-doctors', 'specialties', 'public-specialties',
-      'services', 'public-services', 'packages', 'public-packages',
-      'contact', 'public-contact', 'book-appointment',
+      'home',
+      'public-home',
+      'about',
+      'public-about',
+      'faq',
+      'public-faq',
+      'doctors',
+      'public-doctors',
+      'specialties',
+      'public-specialties',
+      'services',
+      'public-services',
+      'packages',
+      'public-packages',
+      'contact',
+      'public-contact',
+      'book-appointment',
     ].includes(currentView);
 
   // 5. CRM / ERP Routes
@@ -241,32 +304,44 @@ function ClinicAppContent() {
     !isErpRegisterAttempt;
 
   // Check if current ERP route requires Super Admin
-  const isSuperAdminRoute = [
-    '/erp/users', '/erp/admin/users',
-    '/erp/organizations', '/erp/admin/organizations',
-    '/erp/branches', '/erp/admin/branches',
-    '/erp/roles', '/erp/admin/roles',
-    '/erp/settings', '/erp/admin/settings',
-    '/erp/audit-logs', '/erp/admin/audit-logs',
-    '/erp/migrations',
-  ].includes(canonicalView) || [
-    'admin-employees',
-    'admin-departments',
-    'admin-designations',
-    'admin-user-archetypes',
-    'admin-organizations',
-    'admin-branches',
-    'admin-roles',
-    'admin-settings',
-    'admin-audit-logs',
-    'admin-migrations',
-  ].includes(currentView);
+  const isSuperAdminRoute =
+    [
+      '/erp/users',
+      '/erp/admin/users',
+      '/erp/organizations',
+      '/erp/admin/organizations',
+      '/erp/branches',
+      '/erp/admin/branches',
+      '/erp/roles',
+      '/erp/admin/roles',
+      '/erp/settings',
+      '/erp/admin/settings',
+      '/erp/audit-logs',
+      '/erp/admin/audit-logs',
+      '/erp/migrations',
+    ].includes(canonicalView) ||
+    [
+      'admin-employees',
+      'admin-departments',
+      'admin-designations',
+      'admin-user-archetypes',
+      'admin-organizations',
+      'admin-branches',
+      'admin-roles',
+      'admin-settings',
+      'admin-audit-logs',
+      'admin-migrations',
+    ].includes(currentView);
 
   // --- 1. CRM/ERP REGISTRATION ATTEMPT (DOES NOT EXIST) ---
   if (isErpRegisterAttempt) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
-        <Header currentView={canonicalView} onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+        <Header
+          currentView={canonicalView}
+          onNavigate={handleNavigate}
+          onOpenBookingModal={() => handleOpenBookingModal()}
+        />
         <main className="flex-1">
           <AccessDeniedPage
             status={404}
@@ -279,7 +354,10 @@ function ClinicAppContent() {
             onNavigate={handleNavigate}
           />
         </main>
-        <Footer onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+        <Footer
+          onNavigate={handleNavigate}
+          onOpenBookingModal={() => handleOpenBookingModal()}
+        />
       </div>
     );
   }
@@ -289,7 +367,11 @@ function ClinicAppContent() {
     if (isPatient) {
       return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
-          <Header currentView={canonicalView} onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+          <Header
+            currentView={canonicalView}
+            onNavigate={handleNavigate}
+            onOpenBookingModal={() => handleOpenBookingModal()}
+          />
           <main className="flex-1">
             <AccessDeniedPage
               status={403}
@@ -302,7 +384,10 @@ function ClinicAppContent() {
               onNavigate={handleNavigate}
             />
           </main>
-          <Footer onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+          <Footer
+            onNavigate={handleNavigate}
+            onOpenBookingModal={() => handleOpenBookingModal()}
+          />
         </div>
       );
     }
@@ -314,7 +399,11 @@ function ClinicAppContent() {
     if (isErpStaff || isSuperAdmin) {
       return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
-          <Header currentView={canonicalView} onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+          <Header
+            currentView={canonicalView}
+            onNavigate={handleNavigate}
+            onOpenBookingModal={() => handleOpenBookingModal()}
+          />
           <main className="flex-1">
             <AccessDeniedPage
               status={403}
@@ -327,14 +416,21 @@ function ClinicAppContent() {
               onNavigate={handleNavigate}
             />
           </main>
-          <Footer onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+          <Footer
+            onNavigate={handleNavigate}
+            onOpenBookingModal={() => handleOpenBookingModal()}
+          />
         </div>
       );
     }
 
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
-        <Header currentView={canonicalView} onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+        <Header
+          currentView={canonicalView}
+          onNavigate={handleNavigate}
+          onOpenBookingModal={() => handleOpenBookingModal()}
+        />
         <main className="flex-1">
           <ErrorBoundary>
             <PublicLoginPage
@@ -344,7 +440,10 @@ function ClinicAppContent() {
             />
           </ErrorBoundary>
         </main>
-        <Footer onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+        <Footer
+          onNavigate={handleNavigate}
+          onOpenBookingModal={() => handleOpenBookingModal()}
+        />
       </div>
     );
   }
@@ -354,7 +453,11 @@ function ClinicAppContent() {
     if (!isAuthenticated) {
       return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
-          <Header currentView={canonicalView} onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+          <Header
+            currentView={canonicalView}
+            onNavigate={handleNavigate}
+            onOpenBookingModal={() => handleOpenBookingModal()}
+          />
           <main className="flex-1">
             <AccessDeniedPage
               status={401}
@@ -367,7 +470,10 @@ function ClinicAppContent() {
               onNavigate={handleNavigate}
             />
           </main>
-          <Footer onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+          <Footer
+            onNavigate={handleNavigate}
+            onOpenBookingModal={() => handleOpenBookingModal()}
+          />
         </div>
       );
     }
@@ -375,7 +481,11 @@ function ClinicAppContent() {
     if (isErpStaff || isSuperAdmin) {
       return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
-          <Header currentView={canonicalView} onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+          <Header
+            currentView={canonicalView}
+            onNavigate={handleNavigate}
+            onOpenBookingModal={() => handleOpenBookingModal()}
+          />
           <main className="flex-1">
             <AccessDeniedPage
               status={403}
@@ -388,28 +498,45 @@ function ClinicAppContent() {
               onNavigate={handleNavigate}
             />
           </main>
-          <Footer onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+          <Footer
+            onNavigate={handleNavigate}
+            onOpenBookingModal={() => handleOpenBookingModal()}
+          />
         </div>
       );
     }
 
     // Authenticated Patient rendering
     const patientTab =
-      canonicalView === '/profile' || canonicalView === '/my-profile' || currentView === 'patient-profile' || currentView === 'profile' || currentView === 'my-profile'
+      canonicalView === '/profile' ||
+      canonicalView === '/my-profile' ||
+      currentView === 'patient-profile' ||
+      currentView === 'profile' ||
+      currentView === 'my-profile'
         ? 'profile'
-        : canonicalView === '/appointments' || canonicalView === '/my-appointments' || canonicalView === '/booking-confirmation' || canonicalView === '/confirmation' || currentView === 'patient-appointments' || currentView === 'appointments' || currentView === 'my-appointments'
-        ? 'appointments'
-        : currentView.includes('invoice') || currentView.includes('billing')
-        ? 'invoices'
-        : currentView.includes('history')
-        ? 'history'
-        : currentView.includes('referral')
-        ? 'referrals'
-        : 'overview';
+        : canonicalView === '/appointments' ||
+            canonicalView === '/my-appointments' ||
+            canonicalView === '/booking-confirmation' ||
+            canonicalView === '/confirmation' ||
+            currentView === 'patient-appointments' ||
+            currentView === 'appointments' ||
+            currentView === 'my-appointments'
+          ? 'appointments'
+          : currentView.includes('invoice') || currentView.includes('billing')
+            ? 'invoices'
+            : currentView.includes('history')
+              ? 'history'
+              : currentView.includes('referral')
+                ? 'referrals'
+                : 'overview';
 
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
-        <Header currentView={canonicalView} onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+        <Header
+          currentView={canonicalView}
+          onNavigate={handleNavigate}
+          onOpenBookingModal={() => handleOpenBookingModal()}
+        />
         <main className="flex-1">
           <ErrorBoundary>
             <PatientDashboardPage
@@ -421,7 +548,10 @@ function ClinicAppContent() {
             />
           </ErrorBoundary>
         </main>
-        <Footer onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+        <Footer
+          onNavigate={handleNavigate}
+          onOpenBookingModal={() => handleOpenBookingModal()}
+        />
       </div>
     );
   }
@@ -446,32 +576,42 @@ function ClinicAppContent() {
             {canonicalView === '/specialities' && (
               <PublicSpecialtiesPage
                 onNavigate={handleNavigate}
-                onOpenBookingModal={(docId, specId) => handleOpenBookingModal(docId, specId)}
+                onOpenBookingModal={(docId, specId) =>
+                  handleOpenBookingModal(docId, specId)
+                }
               />
             )}
             {canonicalView === '/services' && (
               <PublicServicesPage
                 onNavigate={handleNavigate}
-                onOpenBookingModal={(serviceName) => handleOpenBookingModal(serviceName)}
+                onOpenBookingModal={(serviceName) =>
+                  handleOpenBookingModal(serviceName)
+                }
               />
             )}
             {canonicalView === '/doctors' && (
               <PublicDoctorsPage
                 onNavigate={handleNavigate}
-                onOpenBookingModal={(docId, specId) => handleOpenBookingModal(docId, specId)}
+                onOpenBookingModal={(docId, specId) =>
+                  handleOpenBookingModal(docId, specId)
+                }
               />
             )}
             {isDoctorDetail && (
               <PublicDoctorDetailPage
                 doctorId={doctorDetailId}
                 onNavigate={handleNavigate}
-                onOpenBookingModal={(docId, specId) => handleOpenBookingModal(docId, specId)}
+                onOpenBookingModal={(docId, specId) =>
+                  handleOpenBookingModal(docId, specId)
+                }
               />
             )}
             {canonicalView === '/health-packages' && (
               <PublicPackagesPage
                 onNavigate={handleNavigate}
-                onOpenBookingModal={(pkgName) => handleOpenBookingModal(pkgName)}
+                onOpenBookingModal={(pkgName) =>
+                  handleOpenBookingModal(pkgName)
+                }
               />
             )}
             {canonicalView === '/book-appointment' && (
@@ -490,9 +630,7 @@ function ClinicAppContent() {
               />
             )}
             {canonicalView === '/contact-us' && (
-              <PublicContactPage
-                onNavigate={handleNavigate}
-              />
+              <PublicContactPage onNavigate={handleNavigate} />
             )}
             {canonicalView === '/faq' && (
               <PublicFaqPage
@@ -514,7 +652,11 @@ function ClinicAppContent() {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
-        <Header currentView={canonicalView} onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+        <Header
+          currentView={canonicalView}
+          onNavigate={handleNavigate}
+          onOpenBookingModal={() => handleOpenBookingModal()}
+        />
         <main className="flex-1">
           <AccessDeniedPage
             status={401}
@@ -527,7 +669,10 @@ function ClinicAppContent() {
             onNavigate={handleNavigate}
           />
         </main>
-        <Footer onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+        <Footer
+          onNavigate={handleNavigate}
+          onOpenBookingModal={() => handleOpenBookingModal()}
+        />
       </div>
     );
   }
@@ -535,7 +680,11 @@ function ClinicAppContent() {
   if (isPatient) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
-        <Header currentView={canonicalView} onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+        <Header
+          currentView={canonicalView}
+          onNavigate={handleNavigate}
+          onOpenBookingModal={() => handleOpenBookingModal()}
+        />
         <main className="flex-1">
           <AccessDeniedPage
             status={403}
@@ -548,7 +697,10 @@ function ClinicAppContent() {
             onNavigate={handleNavigate}
           />
         </main>
-        <Footer onNavigate={handleNavigate} onOpenBookingModal={() => handleOpenBookingModal()} />
+        <Footer
+          onNavigate={handleNavigate}
+          onOpenBookingModal={() => handleOpenBookingModal()}
+        />
       </div>
     );
   }
@@ -583,10 +735,7 @@ function ClinicAppContent() {
   return (
     <div className="backoffice-workspace flex h-screen overflow-hidden bg-slate-100/70 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       {/* Sidebar */}
-      <CrmSidebar
-        currentView={currentView}
-        onNavigate={handleNavigate}
-      />
+      <CrmSidebar currentView={currentView} onNavigate={handleNavigate} />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -601,292 +750,294 @@ function ClinicAppContent() {
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 bg-slate-100/70 dark:bg-slate-950 transition-colors duration-200">
           <div className="max-w-7xl mx-auto">
             <ErrorBoundary>
-            {(currentView === 'admin-dashboard' || currentView === '/admin/dashboard' || currentView === '/erp/dashboard' || currentView === '/erp' || currentView === 'erp-dashboard') && (
-              currentRole === 'DOCTOR' ? (
-                <DoctorQueuePage
-                  onOpenPrintModal={handleOpenPrintModal}
+              {(currentView === 'admin-dashboard' ||
+                currentView === '/admin/dashboard' ||
+                currentView === '/erp/dashboard' ||
+                currentView === '/erp' ||
+                currentView === 'erp-dashboard') &&
+                (currentRole === 'DOCTOR' ? (
+                  <DoctorQueuePage
+                    onOpenPrintModal={handleOpenPrintModal}
+                    onNavigate={handleNavigate}
+                  />
+                ) : currentRole === 'RECEPTIONIST' ? (
+                  <AdminAppointmentsPage
+                    onNavigate={handleNavigate}
+                    onOpenBookingModal={() => handleOpenBookingModal()}
+                    onOpenPrintModal={handleOpenPrintModal}
+                  />
+                ) : currentRole === 'ACCOUNTANT' ? (
+                  <AdminBillingPage
+                    onNavigate={handleNavigate}
+                    onOpenPrintModal={handleOpenPrintModal}
+                    onOpenPaymentModal={handleOpenPaymentModal}
+                  />
+                ) : currentRole === 'PHARMACIST' ? (
+                  <AdminInventoryPage onNavigate={handleNavigate} />
+                ) : (
+                  <AdminDashboardPage
+                    onNavigate={handleNavigate}
+                    onOpenBookingModal={() => handleOpenBookingModal()}
+                    onOpenNewPatientModal={() => setIsNewPatientModalOpen(true)}
+                  />
+                ))}
+
+              {(currentView === 'admin-patients' ||
+                currentView === '/admin/patients') && (
+                <AdminPatientsPage
                   onNavigate={handleNavigate}
+                  onOpenNewPatientModal={() => setIsNewPatientModalOpen(true)}
+                  onOpenBookingModal={() => handleOpenBookingModal()}
                 />
-              ) : currentRole === 'RECEPTIONIST' ? (
+              )}
+
+              {currentView.startsWith('admin-patient-detail-') && (
+                <AdminPatientDetailPage
+                  patientId={currentView.replace('admin-patient-detail-', '')}
+                  onNavigate={handleNavigate}
+                  onOpenBookingModal={() => handleOpenBookingModal()}
+                  onOpenPrintModal={handleOpenPrintModal}
+                  onOpenPaymentModal={handleOpenPaymentModal}
+                />
+              )}
+
+              {(currentView === 'admin-appointments' ||
+                currentView === '/admin/appointments' ||
+                currentView === 'reception-queue') && (
                 <AdminAppointmentsPage
                   onNavigate={handleNavigate}
                   onOpenBookingModal={() => handleOpenBookingModal()}
                   onOpenPrintModal={handleOpenPrintModal}
                 />
-              ) : currentRole === 'ACCOUNTANT' ? (
+              )}
+
+              {(currentView === 'admin-doctors' ||
+                currentView === '/admin/doctors') && (
+                <AdminDoctorsPage
+                  onNavigate={handleNavigate}
+                  onOpenBookingModal={() => handleOpenBookingModal()}
+                />
+              )}
+
+              {(currentView === 'admin-billing' ||
+                currentView === '/admin/billing') && (
                 <AdminBillingPage
                   onNavigate={handleNavigate}
                   onOpenPrintModal={handleOpenPrintModal}
                   onOpenPaymentModal={handleOpenPaymentModal}
                 />
-              ) : currentRole === 'PHARMACIST' ? (
+              )}
+
+              {(currentView.startsWith('admin-inventory') ||
+                currentView === 'pharmacy-pos' ||
+                currentView === 'pharmacy-dashboard') && (
                 <AdminInventoryPage
                   onNavigate={handleNavigate}
-                />
-              ) : (
-                <AdminDashboardPage
-                  onNavigate={handleNavigate}
-                  onOpenBookingModal={() => handleOpenBookingModal()}
-                  onOpenNewPatientModal={() => setIsNewPatientModalOpen(true)}
-                />
-              )
-            )}
-
-                {(currentView === 'admin-patients' || currentView === '/admin/patients') && (
-                  <AdminPatientsPage
-                    onNavigate={handleNavigate}
-                    onOpenNewPatientModal={() => setIsNewPatientModalOpen(true)}
-                    onOpenBookingModal={() => handleOpenBookingModal()}
-                  />
-                )}
-
-                {currentView.startsWith('admin-patient-detail-') && (
-                  <AdminPatientDetailPage
-                    patientId={currentView.replace('admin-patient-detail-', '')}
-                    onNavigate={handleNavigate}
-                    onOpenBookingModal={() => handleOpenBookingModal()}
-                    onOpenPrintModal={handleOpenPrintModal}
-                    onOpenPaymentModal={handleOpenPaymentModal}
-                  />
-                )}
-
-                {(currentView === 'admin-appointments' || currentView === '/admin/appointments' || currentView === 'reception-queue') && (
-                  <AdminAppointmentsPage
-                    onNavigate={handleNavigate}
-                    onOpenBookingModal={() => handleOpenBookingModal()}
-                    onOpenPrintModal={handleOpenPrintModal}
-                  />
-                )}
-
-                {(currentView === 'admin-doctors' || currentView === '/admin/doctors') && (
-                  <AdminDoctorsPage
-                    onNavigate={handleNavigate}
-                    onOpenBookingModal={() => handleOpenBookingModal()}
-                  />
-                )}
-
-                {(currentView === 'admin-billing' || currentView === '/admin/billing') && (
-                  <AdminBillingPage
-                    onNavigate={handleNavigate}
-                    onOpenPrintModal={handleOpenPrintModal}
-                    onOpenPaymentModal={handleOpenPaymentModal}
-                  />
-                )}
-
-                {(currentView.startsWith('admin-inventory') || currentView === 'pharmacy-pos' || currentView === 'pharmacy-dashboard') && (
-                  <AdminInventoryPage
-                    onNavigate={handleNavigate}
-                    initialTab={
-                      currentView === 'admin-inventory-items'
-                        ? 'items'
-                        : currentView === 'admin-inventory-movements'
+                  initialTab={
+                    currentView === 'admin-inventory-items'
+                      ? 'items'
+                      : currentView === 'admin-inventory-movements'
                         ? 'movements'
                         : currentView === 'admin-inventory-adjustments'
-                        ? 'adjustments'
-                        : currentView === 'admin-inventory-suppliers'
-                        ? 'suppliers'
-                        : 'dashboard'
-                    }
-                  />
-                )}
+                          ? 'adjustments'
+                          : currentView === 'admin-inventory-suppliers'
+                            ? 'suppliers'
+                            : 'dashboard'
+                  }
+                />
+              )}
 
-                {(currentView === 'admin-labs' || currentView === 'lab-workstation') && (
-                  <AdminLabsPage
-                    onNavigate={handleNavigate}
-                    onOpenPrintModal={handleOpenPrintModal}
-                  />
-                )}
+              {(currentView === 'admin-labs' ||
+                currentView === 'lab-workstation') && (
+                <AdminLabsPage
+                  onNavigate={handleNavigate}
+                  onOpenPrintModal={handleOpenPrintModal}
+                />
+              )}
 
-                {currentView === 'admin-prescriptions' && (
-                  <AdminPrescriptionsPage
-                    onNavigate={handleNavigate}
-                    onOpenPrintModal={handleOpenPrintModal}
-                  />
-                )}
+              {currentView === 'admin-prescriptions' && (
+                <AdminPrescriptionsPage
+                  onNavigate={handleNavigate}
+                  onOpenPrintModal={handleOpenPrintModal}
+                />
+              )}
 
-                {currentView === 'admin-leads' && (
-                  <AdminLeadsPage
-                    onNavigate={handleNavigate}
-                    onOpenBookingModal={() => handleOpenBookingModal()}
-                  />
-                )}
+              {currentView === 'admin-leads' && (
+                <AdminLeadsPage
+                  onNavigate={handleNavigate}
+                  onOpenBookingModal={() => handleOpenBookingModal()}
+                />
+              )}
 
-                {(currentView === 'admin-followups' || currentView === 'doctor-followups') && (
-                  <AdminFollowupsPage
-                    onNavigate={handleNavigate}
-                    onOpenBookingModal={() => handleOpenBookingModal()}
-                  />
-                )}
+              {(currentView === 'admin-followups' ||
+                currentView === 'doctor-followups') && (
+                <AdminFollowupsPage
+                  onNavigate={handleNavigate}
+                  onOpenBookingModal={() => handleOpenBookingModal()}
+                />
+              )}
 
-                {currentView === 'admin-campaigns' && (
-                  <AdminCampaignsPage
-                    onNavigate={handleNavigate}
-                  />
-                )}
+              {currentView === 'admin-campaigns' && (
+                <AdminCampaignsPage onNavigate={handleNavigate} />
+              )}
 
-                {currentView === 'admin-segments' && (
-                  <AdminSegmentsPage
-                    onNavigate={handleNavigate}
-                  />
-                )}
+              {currentView === 'admin-segments' && (
+                <AdminSegmentsPage onNavigate={handleNavigate} />
+              )}
 
-                {currentView === 'admin-automation' && (
-                  <AdminAutomationPage
-                    onNavigate={handleNavigate}
-                  />
-                )}
+              {currentView === 'admin-automation' && (
+                <AdminAutomationPage onNavigate={handleNavigate} />
+              )}
 
-                {currentView === 'admin-feedback' && (
-                  <AdminFeedbackPage
-                    onNavigate={handleNavigate}
-                  />
-                )}
+              {currentView === 'admin-feedback' && (
+                <AdminFeedbackPage onNavigate={handleNavigate} />
+              )}
 
-                {currentView === 'admin-templates' && (
-                  <AdminTemplatesPage
-                    onNavigate={handleNavigate}
-                  />
-                )}
+              {currentView === 'admin-templates' && (
+                <AdminTemplatesPage onNavigate={handleNavigate} />
+              )}
 
-                {currentView === 'admin-referrals' && (
-                  <AdminReferralsPage
-                    onNavigate={handleNavigate}
-                  />
-                )}
+              {currentView === 'admin-referrals' && (
+                <AdminReferralsPage onNavigate={handleNavigate} />
+              )}
 
-                {(currentView === 'admin-services' || currentView === 'admin-packages') && (
-                  <AdminServicesPage
-                    onNavigate={handleNavigate}
-                    onOpenBookingModal={() => handleOpenBookingModal()}
-                  />
-                )}
+              {(currentView === 'admin-services' ||
+                currentView === 'admin-packages') && (
+                <AdminServicesPage
+                  onNavigate={handleNavigate}
+                  onOpenBookingModal={() => handleOpenBookingModal()}
+                />
+              )}
 
-                {currentView === 'admin-specialities' && (
-                  <AdminSettingsPage
-                    onNavigate={handleNavigate}
-                  />
-                )}
+              {currentView === 'admin-specialities' && (
+                <AdminSettingsPage onNavigate={handleNavigate} />
+              )}
 
-                {(currentView === 'admin-staff' || currentView === 'admin-consultations') && (
-                  <AdminDoctorsPage
-                    onNavigate={handleNavigate}
-                    onOpenBookingModal={() => handleOpenBookingModal()}
-                  />
-                )}
+              {(currentView === 'admin-staff' ||
+                currentView === 'admin-consultations') && (
+                <AdminDoctorsPage
+                  onNavigate={handleNavigate}
+                  onOpenBookingModal={() => handleOpenBookingModal()}
+                />
+              )}
 
-                {currentView === 'admin-reports' && (
-                  <AdminReportsPage
-                    onNavigate={handleNavigate}
-                  />
-                )}
+              {currentView === 'admin-reports' && (
+                <AdminReportsPage onNavigate={handleNavigate} />
+              )}
 
-                {(currentView === 'admin-settings' || currentView === '/admin/settings') && (
-                  <AdminSettingsPage
-                    onNavigate={handleNavigate}
-                  />
-                )}
+              {(currentView === 'admin-settings' ||
+                currentView === '/admin/settings') && (
+                <AdminSettingsPage onNavigate={handleNavigate} />
+              )}
 
-                {(currentView === 'admin-audit-logs' || currentView === '/admin/audit-logs' || currentView === 'audit-logs' || currentView === '/audit-logs') && (
-                  <AdminAuditLogsPage
-                    onNavigate={handleNavigate}
-                  />
-                )}
+              {(currentView === 'admin-audit-logs' ||
+                currentView === '/admin/audit-logs' ||
+                currentView === 'audit-logs' ||
+                currentView === '/audit-logs') && (
+                <AdminAuditLogsPage onNavigate={handleNavigate} />
+              )}
 
-                {currentView === 'admin-migrations' && (
-                  <AdminMigrationsPage />
-                )}
+              {currentView === 'admin-migrations' && <AdminMigrationsPage />}
 
-                {currentView === 'admin-organizations' && (
-                  <AdminOrganizationsPage onNavigate={handleNavigate} />
-                )}
+              {currentView === 'admin-organizations' && (
+                <AdminOrganizationsPage onNavigate={handleNavigate} />
+              )}
 
-                {currentView === 'admin-branches' && (
-                  <AdminBranchesPage onNavigate={handleNavigate} />
-                )}
+              {currentView === 'admin-branches' && (
+                <AdminBranchesPage onNavigate={handleNavigate} />
+              )}
 
-                {currentView === 'admin-employees' && (
-                  <AdminEmployeesPage onNavigate={handleNavigate} />
-                )}
+              {currentView === 'admin-employees' && (
+                <AdminEmployeesPage onNavigate={handleNavigate} />
+              )}
 
-                {currentView === 'admin-roles' && (
-                  <AdminRolesPage onNavigate={handleNavigate} />
-                )}
+              {currentView === 'admin-roles' && (
+                <AdminRolesPage onNavigate={handleNavigate} />
+              )}
 
-                {(currentView === 'doctor-queue' || currentView === 'nurse-dashboard' || currentView === 'doctor-appointments') && (
-                  <DoctorQueuePage
-                    onOpenPrintModal={handleOpenPrintModal}
-                    onNavigate={handleNavigate}
-                  />
-                )}
+              {(currentView === 'doctor-queue' ||
+                currentView === 'nurse-dashboard' ||
+                currentView === 'doctor-appointments') && (
+                <DoctorQueuePage
+                  onOpenPrintModal={handleOpenPrintModal}
+                  onNavigate={handleNavigate}
+                />
+              )}
 
-                {currentView === 'doctor-patients' && (
-                  <AdminPatientsPage
-                    onNavigate={handleNavigate}
-                    onOpenNewPatientModal={() => setIsNewPatientModalOpen(true)}
-                    onOpenBookingModal={() => handleOpenBookingModal()}
-                  />
-                )}
+              {currentView === 'doctor-patients' && (
+                <AdminPatientsPage
+                  onNavigate={handleNavigate}
+                  onOpenNewPatientModal={() => setIsNewPatientModalOpen(true)}
+                  onOpenBookingModal={() => handleOpenBookingModal()}
+                />
+              )}
 
-                {currentView === 'doctor-prescriptions' && (
-                  <AdminPrescriptionsPage
-                    onNavigate={handleNavigate}
-                    onOpenPrintModal={handleOpenPrintModal}
-                  />
-                )}
+              {currentView === 'doctor-prescriptions' && (
+                <AdminPrescriptionsPage
+                  onNavigate={handleNavigate}
+                  onOpenPrintModal={handleOpenPrintModal}
+                />
+              )}
 
-                {(currentView === 'reception-dashboard' || currentView === 'reception-appointments') && (
-                  <AdminAppointmentsPage
-                    onNavigate={handleNavigate}
-                    onOpenBookingModal={() => handleOpenBookingModal()}
-                    onOpenPrintModal={handleOpenPrintModal}
-                  />
-                )}
+              {(currentView === 'reception-dashboard' ||
+                currentView === 'reception-appointments') && (
+                <AdminAppointmentsPage
+                  onNavigate={handleNavigate}
+                  onOpenBookingModal={() => handleOpenBookingModal()}
+                  onOpenPrintModal={handleOpenPrintModal}
+                />
+              )}
 
-                {currentView === 'lab-dashboard' && (
-                  <AdminLabsPage
-                    onNavigate={handleNavigate}
-                    onOpenPrintModal={handleOpenPrintModal}
-                  />
-                )}
+              {currentView === 'lab-dashboard' && (
+                <AdminLabsPage
+                  onNavigate={handleNavigate}
+                  onOpenPrintModal={handleOpenPrintModal}
+                />
+              )}
 
-                {currentView === 'accountant-dashboard' && (
-                  <AdminBillingPage
-                    onNavigate={handleNavigate}
-                    onOpenPrintModal={handleOpenPrintModal}
-                    onOpenPaymentModal={handleOpenPaymentModal}
-                  />
-                )}
+              {currentView === 'accountant-dashboard' && (
+                <AdminBillingPage
+                  onNavigate={handleNavigate}
+                  onOpenPrintModal={handleOpenPrintModal}
+                  onOpenPaymentModal={handleOpenPaymentModal}
+                />
+              )}
 
-                {(currentView.startsWith('patient-') || currentView.startsWith('/patient') || currentView === 'patient-portal') && (
-                  <PatientDashboardPage
-                    key={currentView}
-                    initialTab={
-                      currentView.includes('profile')
-                        ? 'profile'
-                        : currentView.includes('home-visit')
+              {(currentView.startsWith('patient-') ||
+                currentView.startsWith('/patient') ||
+                currentView === 'patient-portal') && (
+                <PatientDashboardPage
+                  key={currentView}
+                  initialTab={
+                    currentView.includes('profile')
+                      ? 'profile'
+                      : currentView.includes('home-visit')
                         ? 'book-home-visit'
                         : currentView.includes('appointments')
-                        ? 'appointments'
-                        : currentView.includes('billing') || currentView.includes('invoices')
-                        ? 'invoices'
-                        : currentView.includes('history') || currentView.includes('prescriptions') || currentView.includes('reports')
-                        ? 'history'
-                        : currentView.includes('referral')
-                        ? 'referrals'
-                        : currentView.includes('book')
-                        ? 'book-appointment'
-                        : 'overview'
-                    }
-                    onOpenBookingModal={() => handleOpenBookingModal()}
-                    onOpenPrintModal={handleOpenPrintModal}
-                    onOpenPaymentModal={handleOpenPaymentModal}
-                    onNavigate={handleNavigate}
-                  />
-                )}
-                </ErrorBoundary>
-              </div>
-            </main>
+                          ? 'appointments'
+                          : currentView.includes('billing') ||
+                              currentView.includes('invoices')
+                            ? 'invoices'
+                            : currentView.includes('history') ||
+                                currentView.includes('prescriptions') ||
+                                currentView.includes('reports')
+                              ? 'history'
+                              : currentView.includes('referral')
+                                ? 'referrals'
+                                : currentView.includes('book')
+                                  ? 'book-appointment'
+                                  : 'overview'
+                  }
+                  onOpenBookingModal={() => handleOpenBookingModal()}
+                  onOpenPrintModal={handleOpenPrintModal}
+                  onOpenPaymentModal={handleOpenPaymentModal}
+                  onNavigate={handleNavigate}
+                />
+              )}
+            </ErrorBoundary>
           </div>
+        </main>
+      </div>
 
       {/* GLOBAL MODALS */}
       <BookAppointmentModal
